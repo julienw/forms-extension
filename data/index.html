@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang='fr'>
   <head>
     <meta charset='UTF-8' />
     <title>Working hours</title>
@@ -7,9 +7,50 @@
   </head>
   <body>
     <h1>Décompte des heures de travail plafonné en jours sur l'année</h1>
-    <h2>Monitoring form of working hours capped in days over the year</h2>
-    <div class='who'>
-      M
+    <h2 lang='en'>Monitoring form of working hours capped in days over the year</h2>
+    <div class='worker-information'>
+      <div class='who'>M <span class='last-name'>Lastname</span></div>
+      <div>Poste (<em lang='en'>position</em>): <span class='position'>Engineer</span></div>
     </div>
+    <div class='week-information'>
+      <div>Semaine du <span class='week-start'></span> au <span
+          class='week-end'></span></div>
+      <div lang='en'>Week from <span class='week-start'></span> au <span
+          class='week-end'></span></div>
+    </div>
+
+    <table class='worked-days-table'>
+      <tr>
+        <td></td>
+        <th>Lundi <em lang='en'>(Monday)</em></th>
+        <th>Mardi <em lang='en'>(Tuesday)</em></th>
+        <th>Mercredi <em lang='en'>(Wednesday)</em></th>
+        <th>Jeudi <em lang='en'>(Thursday)</em></th>
+        <th>Vendredi <em lang='en'>(Friday)</em></th>
+      </tr>
+      <tr class='worked-days-row'>
+        <th>Jour travaillé <em lang='en'>(Day worked)</em></th>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr class='absence-row'>
+        <th>Absence</th>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
+    <footer>
+      <div class='date-information'>Date: <span class='date'></span></div>
+      <div class='worker-signature'><span class='signature'></span><span
+          class='worker-name'>M <span class='last-name'></span></span></div>
+      <div class='manager-signature'><span class='signature'></span><span
+          class='manager-name'>M <span class='manager-last-name'></span></span></div>
+    </footer>
   </body>
 </html>
