@@ -1,9 +1,48 @@
 /*jshint esnext: true */
-function show(weeks) {
-  weeks.forEach(week => {
-    week.holidayWeek = getHolidayWeek(week);
+function show(holidays) {
+  var weeks = [];
+
+  holidays.forEach(holiday => {
+    holiday.forEach(week => {
+      week.holidayWeek = getHolidayWeek(week);
+      //delete week.holidayStart;
+      //delete week.holidayEnd;
+      weeks.push(week);
+    });
   });
+
+  weeks = sortAndMerge(weeks);
   displayWeeks(weeks);
+}
+
+/**
+ * Inversely chronologically sort the weeks, and merge identical ones.
+ *
+ * We expect weeks to be properly structured already.
+ */
+function sortAndMerge(weeks) {
+  weeks = weeks.sort((weekA, weekB) => weekB.start - weekA.start);
+
+  weeks = weeks.reduce((weeks, week) => {
+    if (!weeks.length) {
+      weeks.push(week);
+      return weeks;
+    }
+
+    var previous = weeks[weeks.length - 1];
+    if (+previous.start === +week.start) {
+      // same week => merge to the previous one
+      previous.holidayWeek = previous.holidayWeek.map(
+        (bool, i) => bool || week.holidayWeek[i]
+      );
+      return weeks;
+    }
+
+    weeks.push(week);
+    return weeks;
+  }, []);
+
+  return weeks;
 }
 
 /**
@@ -13,10 +52,15 @@ function show(weeks) {
  * @returns {Array.<Boolean>}
  */
 function getHolidayWeek(week) {
+  // convert back from json
+  ['start', 'end', 'holidayStart', 'holidayEnd'].forEach(prop => {
+    week[prop] = new Date(week[prop]);
+  });
+
   var holidayWeek = new Array(5);
-  var curDate = new Date(+week.start);
-  var firstDay = curDate.getUTCDate();
+  var firstDay = week.start.getUTCDate();
   for (var i = 0; i < 5; i++) {
+    var curDate = new Date(+week.start);
     curDate.setUTCDate(firstDay + i);
     holidayWeek[i] = week.holidayStart <= curDate && curDate <= week.holidayEnd;
   }
