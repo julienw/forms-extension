@@ -8,18 +8,21 @@
     <script defer src='fake-data.js'></script>
   </head>
   <body onload='doShow(fakeData)'>
-    <form class='choose-weeks-form'>
-      <button
-        type='button' class='fake-button'
-        onclick='document.querySelector("form").textContent = ""; doShow(fakeData)'>
-          Redisplay fake data !
-      </button>
-      <button>Generate form</button>
-      <input type='range' class='easy-selector-range' value='0'></input>
+    <form class='choose-weeks-form hide-future'>
+      <div class='controls'>
+        <button
+          type='button' class='fake-button'
+          onclick='Array.from(document.querySelector("form label")).forEach(elt => elt.remove()); doShow(fakeData)'>
+            Redisplay fake data !
+        </button>
+        <button>Generate form</button>
+        <input type='range' class='easy-selector-range' value='0'></input>
+        <label><input type='checkbox' class='show-future-checkbox'> Show future</label>
+      </div>
     </form>
 
     <div id='week-template' hidden><!--
-    <label class='week-${id}' data-start='${weekStart}' data-end='${weekEnd}'>
+    <label class='week-line week-${id} ${futureClass}' data-start='${weekStart}' data-end='${weekEnd}'>
       <input type='checkbox'> Semaine du ${weekStartText} au ${weekEndText}
     </label>
     --></div>

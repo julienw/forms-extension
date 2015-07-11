@@ -9,6 +9,7 @@ var form = document.querySelector('.choose-weeks-form');
 
 initRange();
 initForm();
+initFuture();
 
 function show(holidays) {
   document.querySelector('.fake-button').hidden = true;
@@ -28,6 +29,7 @@ function doShow(holidays) {
   });
 
   weeks = sortAndMerge(weeks);
+  findFuture(weeks);
   configureRange();
   displayWeeks();
   onRangeChange();
@@ -50,6 +52,13 @@ function initForm() {
     e.preventDefault();
 
     generatePTOForm();
+  });
+}
+
+function initFuture() {
+  var future = document.querySelector('.show-future-checkbox');
+  future.addEventListener('change', () => {
+    form.classList.toggle('hide-future', !future.checked);
   });
 }
 
@@ -91,6 +100,12 @@ function sortAndMerge(weeks) {
   return weeks;
 }
 
+function findFuture(weeks) {
+  weeks.forEach((week) => {
+    week.future = week.end > Date.now();
+  });
+}
+
 /**
  * Returns an array of 5 elements, with booleans indicating whether each day of
  * the week is part of the holiday.
@@ -122,7 +137,8 @@ function displayWeeks() {
       weekStart: week.start,
       weekEnd: week.end,
       weekStartText: week.start.toLocaleDateString(undefined, opts),
-      weekEndText: week.end.toLocaleDateString(undefined, opts)
+      weekEndText: week.end.toLocaleDateString(undefined, opts),
+      futureClass: week.future ? 'week-future' : ''
     }));
   });
 }
