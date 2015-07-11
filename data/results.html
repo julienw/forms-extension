@@ -3,7 +3,25 @@
   <head>
     <meta charset='utf-8'>
     <link rel='stylesheet' href='style.css'>
+    <script defer src='template.js'></script>
+    <script defer src='results-display.js'></script>
+    <script defer src='fake-data.js'></script>
   </head>
-  <body>
+  <body onload='doShow(fakeData)'>
+    <form class='choose-weeks-form'>
+      <button
+        type='button' class='fake-button'
+        onclick='document.querySelector("form").textContent = ""; doShow(fakeData)'>
+          Redisplay fake data !
+      </button>
+      <button>Generate form</button>
+      <input type='range' class='easy-selector-range' value='0'></input>
+    </form>
+
+    <div id='week-template' hidden><!--
+    <label class='week-${id}' data-start='${weekStart}' data-end='${weekEnd}'>
+      <input type='checkbox'> Semaine du ${weekStartText} au ${weekEndText}
+    </label>
+    --></div>
   </body>
 </html>

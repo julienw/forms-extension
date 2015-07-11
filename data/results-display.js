@@ -1,6 +1,22 @@
 /*jshint esnext: true */
+var templates = {
+  week: Template('week-template')
+};
+
+var weeks;
+var range = document.querySelector('.easy-selector-range');
+var form = document.querySelector('.choose-weeks-form');
+
+initRange();
+initForm();
+
 function show(holidays) {
-  var weeks = [];
+  document.querySelector('.fake-button').hidden = true;
+  doShow(holidays);
+}
+
+function doShow(holidays) {
+  weeks = [];
 
   holidays.forEach(holiday => {
     holiday.forEach(week => {
@@ -12,7 +28,37 @@ function show(holidays) {
   });
 
   weeks = sortAndMerge(weeks);
-  displayWeeks(weeks);
+  configureRange();
+  displayWeeks();
+  onRangeChange();
+}
+
+function onRangeChange() {
+  weeks.forEach((week, id) => {
+    var limit = range.valueAsNumber;
+    var input = document.querySelector(`.week-${id} input`);
+    input.checked = id < limit;
+  });
+}
+
+function initRange() {
+  range.addEventListener('input', onRangeChange);
+}
+
+function initForm() {
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    generatePTOForm();
+  });
+}
+
+function generatePTOForm() {
+  form.hidden = true;
+}
+
+function configureRange() {
+  range.max = weeks.length;
 }
 
 /**
@@ -67,14 +113,18 @@ function getHolidayWeek(week) {
   return holidayWeek;
 }
 
-function displayWeeks(weeks) {
-  var output = document.createElement('ul');
-  for (var week of weeks) {
-    var li = document.createElement('li');
-    li.textContent = JSON.stringify(week);
-    output.appendChild(li);
-  }
-  document.body.appendChild(output);
+function displayWeeks() {
+  var form = document.querySelector('.choose-weeks-form');
+  var opts = { day: "numeric", month: 'long', year: "numeric" };
+  weeks.forEach((week, id) => {
+    form.insertAdjacentHTML('beforeend', templates.week.interpolate({
+      id,
+      weekStart: week.start,
+      weekEnd: week.end,
+      weekStartText: week.start.toLocaleDateString(undefined, opts),
+      weekEndText: week.end.toLocaleDateString(undefined, opts)
+    }));
+  });
 }
 
 // taken from the gaia sms app
@@ -84,3 +134,4 @@ function camelCase(str) {
     return p1.toUpperCase();
   });
 }
+

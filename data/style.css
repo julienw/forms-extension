@@ -1,3 +1,17 @@
-body {
-  background: red;
+label {
+  display: block;
+  padding: .5em 1em;
+  border-bottom: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+label:first-of-type {
+  border-top: 1px solid #ccc;
+}
+
+label:hover {
+  background: #eee;
 }
