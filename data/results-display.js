@@ -40,6 +40,7 @@ function onRangeChange() {
     var limit = range.valueAsNumber;
     var input = document.querySelector(`.week-${id} input`);
     input.checked = id < limit;
+    onCheckboxChange(input);
   });
 }
 
@@ -47,11 +48,21 @@ function initRange() {
   range.addEventListener('input', onRangeChange);
 }
 
+function onCheckboxChange(checkbox) {
+  checkbox.parentNode.classList.toggle('selected', checkbox.checked);
+}
+
 function initForm() {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     generatePTOForm();
+  });
+
+  form.addEventListener('change', (e) => {
+    if (e.target.matches('input[type=checkbox]')) {
+      onCheckboxChange(e.target);
+    }
   });
 }
 

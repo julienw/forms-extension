@@ -11,7 +11,11 @@
 }
 
 .week-line:hover {
-  background: #eee;
+  background: #f3f3f3;
+}
+
+.week-line.selected {
+  background: #e8e8e8;
 }
 
 label {
