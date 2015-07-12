@@ -29,18 +29,6 @@
         <th>Vendredi <em lang='en'>(Friday)</em></th>
         <th class='total'>Total</th>
       </tr>
-      <tr class='absence-row'>
-        <th>Absence
-          <div>Semaine du <span class='from'></span> au <span class='to'></span></div>
-          <div lang='en'>Week from <span class='from'></span> to <span class='to'></span></div>
-        </th>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td class='total'></td>
-      </tr>
     </table>
     <p>
       Dans la limite de 220 jours par an et sous réserve du respect des
@@ -85,5 +73,20 @@
       <div class='manager-signature'><span class='signature'></span><span
           class='manager-name'>M <span class='manager-last-name'></span></span></div>
     </footer>
+
+    <div id='form-row-template' hidden><!--
+      <tr class='absence-row'>
+        <th>Absence
+          <div>Semaine du <span class='from'>${weekStart}</span> au <span class='to'>${weekEnd}</span></div>
+          <div lang='en'>Week from <span class='from'>${weekStartUS}</span> to <span class='to'>${weekEndUs}</span></div>
+        </th>
+        <td>${day1}</td>
+        <td>${day2}</td>
+        <td>${day3}</td>
+        <td>${day4}</td>
+        <td>${day5}</td>
+        <td class='total'>${total}</td>
+      </tr>
+    --></div>
   </body>
 </html>
