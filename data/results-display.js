@@ -1,11 +1,18 @@
 /*jshint esnext: true */
 var templates = {
-  week: Template('week-template')
+  week: Template('week-template'),
+  ptoWeek: Template('form-row-template')
 };
 
 var weeks;
 var range = document.querySelector('.easy-selector-range');
 var form = document.querySelector('.choose-weeks-form');
+var sections = {
+  choose: document.querySelector('.choose-form'),
+  pto: document.querySelector('.pto-form')
+};
+var future = document.querySelector('.show-future-checkbox');
+var ptoTable = document.querySelector('.worked-days-table');
 
 initRange();
 initForm();
@@ -67,14 +74,40 @@ function initForm() {
 }
 
 function initFuture() {
-  var future = document.querySelector('.show-future-checkbox');
   future.addEventListener('change', () => {
     form.classList.toggle('hide-future', !future.checked);
   });
 }
 
 function generatePTOForm() {
-  form.hidden = true;
+  sections.choose.hidden = true;
+  var weeksToDisplay = weeks.filter((week, id) => {
+    var includeFuture = future.checked;
+    var isFuture = week.future;
+    var input = document.querySelector(`.week-${id} input`);
+    var isChecked = input.checked;
+
+    return (!isFuture || includeFuture) && isChecked;
+  });
+  weeksToDisplay.forEach((week, id) => {
+    var interpolateData = {
+      id,
+      weekStart: week.start.toLocaleDateString(),
+      weekEnd: week.end.toLocaleDateString(),
+      weekStartUS: week.start.toLocaleDateString('en-US'),
+      weekEndUS: week.end.toLocaleDateString('en-US')
+    };
+
+    interpolateData.total = week.holidayWeek.filter((isHoliday, i) => {
+      interpolateData[`day${i}`] = isHoliday || '';
+      return isHoliday;
+    }).length;
+
+    ptoTable.insertAdjacentHTML(
+      'beforeend', templates.ptoWeek.interpolate(interpolateData)
+    );
+  });
+  sections.pto.hidden = false;
 }
 
 function configureRange() {
@@ -134,7 +167,8 @@ function getHolidayWeek(week) {
   for (var i = 0; i < 5; i++) {
     var curDate = new Date(+week.start);
     curDate.setUTCDate(firstDay + i);
-    holidayWeek[i] = week.holidayStart <= curDate && curDate <= week.holidayEnd;
+    var isHoliday = week.holidayStart <= curDate && curDate <= week.holidayEnd;
+    holidayWeek[i] = isHoliday && (week.type || 'CP');
   }
   return holidayWeek;
 }

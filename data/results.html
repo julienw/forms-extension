@@ -8,23 +8,106 @@
     <script defer src='fake-data.js'></script>
   </head>
   <body onload='doShow(fakeData)'>
-    <form class='choose-weeks-form hide-future'>
-      <div class='controls'>
-        <button
-          type='button' class='fake-button'
-          onclick='Array.from(document.querySelector("form label")).forEach(elt => elt.remove()); doShow(fakeData)'>
-            Redisplay fake data !
-        </button>
-        <button>Generate form</button>
-        <input type='range' class='easy-selector-range' value='0'></input>
-        <label><input type='checkbox' class='show-future-checkbox'> Show future</label>
+    <section class='choose-form'>
+      <form class='choose-weeks-form hide-future'>
+        <div class='controls'>
+          <button
+            type='button' class='fake-button'
+            onclick='Array.from(document.querySelector("form label")).forEach(elt => elt.remove()); doShow(fakeData)'>
+              Redisplay fake data !
+          </button>
+          <button>Generate form</button>
+          <input type='range' class='easy-selector-range' value='0'></input>
+          <label><input type='checkbox' class='show-future-checkbox'> Show future</label>
+        </div>
+      </form>
+    </section>
+
+    <!-- PTO FORM -->
+    <section class='pto-form' hidden>
+      <h1>Décompte des heures de travail plafonné en jours sur l'année</h1>
+      <h2 lang='en'>Monitoring form of working hours capped in days over the year</h2>
+      <div class='worker-information'>
+        <div class='who'>M <span class='last-name'>Lastname</span></div>
+        <div>Poste (<em lang='en'>position</em>): <span class='position'>Engineer</span></div>
       </div>
-    </form>
+
+      <table class='worked-days-table'>
+        <tr>
+          <td></td>
+          <th>Lundi <em lang='en'>(Monday)</em></th>
+          <th>Mardi <em lang='en'>(Tuesday)</em></th>
+          <th>Mercredi <em lang='en'>(Wednesday)</em></th>
+          <th>Jeudi <em lang='en'>(Thursday)</em></th>
+          <th>Vendredi <em lang='en'>(Friday)</em></th>
+          <th class='total'>Total</th>
+        </tr>
+      </table>
+      <p>
+        Dans la limite de 220 jours par an et sous réserve du respect des
+        congés d'ancienneté.
+      </p>
+      <p lang='en'>
+        Within the limit of 220 days per year and subject to the
+        compliance with seniority vacation.
+      </p>
+      <section>
+        <h3>
+          Codes d'absence
+          <em lang='en'>Absence codes</em>
+        </h3>
+        <dl>
+          <dt>CP</dt>
+          <dd>Congés payés <span lang='en'>(Paid vacation)</span></dd>
+          <dt>JF</dt>
+          <dd>Jour férié <span lang='en'>(Rest day)</span></dd>
+          <dt>A</dt>
+          <dd>Anniversaire <span lang='en'>(B-day day off)</span></dd>
+          <dt>CSS</dt>
+          <dd>Congé sans solde <span lang='en'>(Unpaid leave)</span></dd>
+          <dt>R</dt>
+          <dd>Jour RTT</dd>
+          <dt>M</dt>
+          <dd>Arrêt maladie <span lang='en'>(Sickness)</span></dd>
+        </dl>
+      </section>
+      <p>
+        A retourner à Doris Coleman chaque mois, après avoir été validé par votre
+        supérieur hiérarchique.
+      </p>
+      <p lang='en'>
+        To be returned to Doris Coleman each month, after having been duly validated
+        by your Manager.
+      </p>
+      <footer>
+        <div class='date-information'>Date: <span class='date'></span></div>
+        <div class='worker-signature'><span class='signature'></span><span
+            class='worker-name'>M <span class='last-name'></span></span></div>
+        <div class='manager-signature'><span class='signature'></span><span
+            class='manager-name'>M <span class='manager-last-name'></span></span></div>
+      </footer>
+    </section>
+
 
     <div id='week-template' hidden><!--
     <label class='week-line week-${id} ${futureClass}' data-start='${weekStart}' data-end='${weekEnd}'>
       <input type='checkbox'> Semaine du ${weekStartText} au ${weekEndText}
     </label>
+    --></div>
+
+    <div id='form-row-template' hidden><!--
+      <tr class='absence-row'>
+        <th>Absence
+          <div>Semaine du <span class='from'>${weekStart}</span> au <span class='to'>${weekEnd}</span></div>
+          <div lang='en'>Week from <span class='from'>${weekStartUS}</span> to <span class='to'>${weekEndUS}</span></div>
+        </th>
+        <td>${day0}</td>
+        <td>${day1}</td>
+        <td>${day2}</td>
+        <td>${day3}</td>
+        <td>${day4}</td>
+        <td class='total'>${total}</td>
+      </tr>
     --></div>
   </body>
 </html>
