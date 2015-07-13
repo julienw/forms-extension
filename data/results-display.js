@@ -17,13 +17,16 @@ var ptoTable = document.querySelector('.worked-days-table');
 initRange();
 initForm();
 initFuture();
+initFakeData();
 
-function show(holidays) {
-  document.querySelector('.fake-button').hidden = true;
-  doShow(holidays);
+function initFakeData() {
+  if (window.location.protocol !== 'resource:') {
+    // we're not in the addon
+    show(fakeData);
+  }
 }
 
-function doShow(holidays) {
+function show(holidays) {
   weeks = [];
 
   holidays.forEach(holiday => {
