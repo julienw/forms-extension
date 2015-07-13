@@ -22,7 +22,9 @@ initFakeData();
 function initFakeData() {
   if (window.location.protocol !== 'resource:') {
     // we're not in the addon
+    range.value = 10;
     show(fakeData);
+    generatePTOForm();
   }
 }
 
