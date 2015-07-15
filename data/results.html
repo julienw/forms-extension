@@ -4,8 +4,10 @@
     <meta charset='utf-8'>
     <link rel='stylesheet' href='style.css'>
     <script defer src='template.js'></script>
+    <script defer src='utils.js'></script>
     <script defer src='fake-data.js'></script>
     <script defer src='results-display.js'></script>
+    <script defer src='form-persistence.js'></script>
   </head>
   <body>
     <section class='choose-form'>
@@ -23,8 +25,8 @@
       <h1>Décompte des heures de travail plafonné en jours sur l'année</h1>
       <h2 lang='en'>Monitoring form of working hours capped in days over the year</h2>
       <div class='worker-information'>
-        <div class='who'>M <span class='last-name'>Lastname</span></div>
-        <div>Poste (<em lang='en'>position</em>): <span class='position'>Engineer</span></div>
+        <div class='who'>M <span class='last-name' contenteditable='true' data-persist='last-name'>Lastname</span></div>
+        <div>Poste (<em lang='en'>position</em>): <span class='position' contenteditable='true' data-persist='position'>Engineer</span></div>
       </div>
 
       <table class='worked-days-table'>
@@ -49,7 +51,7 @@
       <section>
         <h3>
           Codes d'absence
-          <em lang='en'>Absence codes</em>
+          <em lang='en'>(Absence codes)</em>
         </h3>
         <dl>
           <dt>CP</dt>

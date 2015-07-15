@@ -58,3 +58,8 @@ label {
   /* force width for the first column */
   width: 25em;
 }
+
+[contenteditable=true] {
+  border: 1px solid #ccc;
+  padding: .2em .5em;
+}
