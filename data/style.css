@@ -36,3 +36,25 @@ label {
 .hide-future .week-future {
   display: none;
 }
+
+/** table styling **/
+
+.worked-days-table {
+  width: 100%;
+  table-layout: fixed;
+
+  text-align: center;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+.worked-days-table :-moz-any(th, td) {
+  border: 1px solid #ccc;
+
+  padding: .5em 1em;
+}
+
+.worked-days-table td:first-child {
+  /* force width for the first column */
+  width: 25em;
+}
