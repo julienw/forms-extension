@@ -7,6 +7,11 @@ var table = document.querySelector('.worked-days-table');
 attachHighlightHandlers();
 attachUnlinkHandlers();
 attachDisplayedHandler();
+attachInputHandler();
+
+function attachInputHandler() {
+  table.addEventListener('input', onInput);
+}
 
 function attachHighlightHandlers() {
   table.addEventListener('mouseover', (e) => {
@@ -37,19 +42,6 @@ function attachUnlinkHandlers() {
       handleUnlink(e.target.closest('td'));
     }
   });
-}
-
-function handleUnlink(cell) {
-  var holidayIdx = getHolidayIndexFromDataset(cell);
-  if (holidayIdx === null) {
-    return;
-  }
-
-  var holiday = model[holidayIdx];
-  holiday.linked = !holiday.linked;
-  holiday.cells.forEach(
-    cell => cell.classList.toggle('cell-unlinked', !holiday.linked)
-  );
 }
 
 function getHolidayIndexFromDataset(cell) {
@@ -83,13 +75,26 @@ function buildModel() {
   });
 }
 
-function highlightHolidayFromCell(cell) {
-  var holidayIdx = cell.dataset.holidayIndex;
-  if (!holidayIdx) {
+function handleUnlink(cell) {
+  var holidayIdx = getHolidayIndexFromDataset(cell);
+  if (holidayIdx === null) {
     return;
   }
-  holidayIdx = +holidayIdx;
-  if (!holidayIdx || holidayIdx < 0) {
+
+  var holiday = model[holidayIdx];
+  holiday.linked = !holiday.linked;
+  holiday.cells.forEach(
+    cell => cell.classList.toggle('cell-unlinked', !holiday.linked)
+  );
+
+  if (holiday.linked) {
+    mirrorHolidayValue(cell);
+  }
+}
+
+function highlightHolidayFromCell(cell) {
+  var holidayIdx = getHolidayIndexFromDataset(cell);
+  if (holidayIdx === null) {
     return;
   }
 
@@ -105,6 +110,32 @@ function removeAllHighlights() {
   Array.from(table.querySelectorAll('.cell-highlight')).forEach(
     (cell) => cell.classList.remove('cell-highlight')
   );
+}
+
+function onInput(e) {
+  if (e.target.isContentEditable) {
+    mirrorHolidayValue(e.target.closest('td'));
+  }
+}
+
+function mirrorHolidayValue(cell) {
+  var holidayIdx = getHolidayIndexFromDataset(cell);
+  if (holidayIdx === null) {
+    return;
+  }
+  
+  var holiday = model[holidayIdx];
+  if (!holiday.linked) {
+    return;
+  }
+
+  var value = cell.querySelector('[contenteditable="true"]').textContent;
+  holiday.cells.forEach(mirroredCell => {
+    if (mirroredCell !== cell) {
+      var mirroredContent = mirroredCell.querySelector('[contenteditable="true"]');
+      mirroredContent.textContent = value || '\u00a0';
+    }
+  });
 }
 
 })();

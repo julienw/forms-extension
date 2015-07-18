@@ -130,6 +130,7 @@ function generatePTOForm() {
 
       var cellData = {
         holidayIndex: holidayIdx,
+        editable: isHoliday,
         type: 
           isHoliday ?
           holidays[holidayIdx][0].type || 'CP' :

@@ -5,9 +5,9 @@
 var ptoForm = document.querySelector('.pto-form');
 
 restoreSavedValues();
-initInputHandler();
+attachInputHandler();
 
-function initInputHandler() {
+function attachInputHandler() {
   ptoForm.addEventListener('input', Utils.throttle(onInput, 500));
 }
 

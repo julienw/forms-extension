@@ -63,6 +63,10 @@ label {
   width: 25em;
 }
 
+[contenteditable=true]:before {
+  content: ' ';
+}
+
 [contenteditable=true] {
   border: 1px solid #ccc;
   padding: .2em .5em;
