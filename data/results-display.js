@@ -1,6 +1,6 @@
 /*jshint esnext: true */
 
-(function() {
+(function(exports) {
 'use strict';
 
 var templates = {
@@ -46,7 +46,7 @@ function initFakeData() {
  * @typedef {Array.<HolidayWeek>} Holiday
  */
 /**
- * @param {Array.<Holiday>} holifays
+ * @param {Array.<Holiday>} aHolidays
  */
 function show(aHolidays) {
   weeks = [];
@@ -240,4 +240,6 @@ function camelCase(str) {
   });
 }
 
-})();
+exports.generateForm = show;
+
+})(window);
