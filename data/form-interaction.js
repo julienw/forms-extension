@@ -41,6 +41,8 @@ function attachDisplayedHandler() {
 function attachUnlinkHandlers() {
   table.addEventListener('click', (e) => {
     if (e.target.matches('.unlink-button')) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
       handleUnlink(e.target.closest('td'));
     }
   });
