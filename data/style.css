@@ -10,7 +10,7 @@
   border-bottom: 1px solid #ccc;
 }
 
-.week-line:hover {
+.week-line:hover, .cell-highlight {
   background: #f3f3f3;
 }
 
@@ -54,6 +54,8 @@ label {
   border: 1px solid #ccc;
 
   padding: .5em 1em;
+
+  position: relative;
 }
 
 .worked-days-table td:first-child {
@@ -64,4 +66,27 @@ label {
 [contenteditable=true] {
   border: 1px solid #ccc;
   padding: .2em .5em;
+}
+
+.unlink-button {
+  position: absolute;
+
+  top: 0;
+  right: 0;
+
+  width: 50px;
+  height: 30px;
+
+  background: url(gimp-hchain.png) center no-repeat;
+  border: 0;
+
+  cursor: pointer;
+}
+
+[data-holiday-index="-1"] .unlink-button {
+  display: none;
+}
+
+.cell-unlinked .unlink-button {
+  background-image: url(gimp-hchain-broken.png);
 }

@@ -8,6 +8,7 @@
     <script defer src='fake-data.js'></script>
     <script defer src='results-display.js'></script>
     <script defer src='form-persistence.js'></script>
+    <script defer src='form-interaction.js'></script>
   </head>
   <body>
     <section class='choose-form'>
@@ -100,13 +101,15 @@
           <div>Semaine du <span class='from'>${weekStart}</span> au <span class='to'>${weekEnd}</span></div>
           <div lang='en'>Week from <span class='from'>${weekStartUS}</span> to <span class='to'>${weekEndUS}</span></div>
         </th>
-        <td>${day0}</td>
-        <td>${day1}</td>
-        <td>${day2}</td>
-        <td>${day3}</td>
-        <td>${day4}</td>
+        ${cells}
         <td class='total'>${total}</td>
       </tr>
+    --></div>
+    <div id='form-cell-template' hidden><!--
+      <td data-holiday-index='${holidayIndex}'>
+        <button type='button' class='unlink-button' aria-title='This cell is linked to other cells for this holiday. Click to unlink.'></button>
+        ${type}
+      </td>
     --></div>
   </body>
 </html>

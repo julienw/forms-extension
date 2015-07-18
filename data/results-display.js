@@ -1,7 +1,8 @@
 /*jshint esnext: true */
 var templates = {
   week: Template('week-template'),
-  ptoWeek: Template('form-row-template')
+  ptoRow: Template('form-row-template'),
+  ptoCell: Template('form-cell-template')
 };
 
 var weeks;
@@ -116,25 +117,36 @@ function generatePTOForm() {
       weekStart: week.start.toLocaleDateString(),
       weekEnd: week.end.toLocaleDateString(),
       weekStartUS: week.start.toLocaleDateString('en-US'),
-      weekEndUS: week.end.toLocaleDateString('en-US')
+      weekEndUS: week.end.toLocaleDateString('en-US'),
+      cells: ''
     };
 
     interpolateData.total = week.holidayWeek.filter((holidayIdx, i) => {
       var isHoliday = holidayIdx >= 0;
 
-      interpolateData[`day${i}`] =
-        isHoliday ?
-        holidays[holidayIdx][0].type || 'CP' :
-        '';
+      var cellData = {
+        holidayIndex: holidayIdx,
+        type: 
+          isHoliday ?
+          holidays[holidayIdx][0].type || 'CP' :
+          ''
+      };
+
+      interpolateData.cells += templates.ptoCell.interpolate(cellData);
 
       return isHoliday;
     }).length;
 
     ptoTable.insertAdjacentHTML(
-      'beforeend', templates.ptoWeek.interpolate(interpolateData)
+      'beforeend',
+      templates.ptoRow.interpolate(
+        interpolateData, { safe: ['cells']}
+      )
     );
   });
   sections.pto.hidden = false;
+
+  setTimeout(() => window.dispatchEvent(new CustomEvent('table-displayed')));
 }
 
 function configureRange() {
