@@ -1,5 +1,6 @@
 /*jshint esnext: true */
 (function() {
+'use strict';
 
 var ptoForm = document.querySelector('.pto-form');
 

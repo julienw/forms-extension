@@ -1,8 +1,12 @@
 /*jshint esnext: true */
+
+(function() {
+'use strict';
+
 var templates = {
-  week: Template('week-template'),
-  ptoRow: Template('form-row-template'),
-  ptoCell: Template('form-cell-template')
+  week: new Template('week-template'),
+  ptoRow: new Template('form-row-template'),
+  ptoCell: new Template('form-cell-template')
 };
 
 var weeks;
@@ -235,3 +239,4 @@ function camelCase(str) {
   });
 }
 
+})();
