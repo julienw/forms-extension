@@ -58,6 +58,13 @@ function getHolidayIndexFromDataset(cell) {
   return holidayIdx;
 }
 
+function recalculateTotal(tr) {
+  var totalCell = tr.querySelector('.total');
+  var editableCells = tr.querySelectorAll('td [contenteditable="true"]');
+  var total = Array.from(editableCells).filter(cell => cell.textContent.trim()).length;
+  totalCell.textContent = total;
+}
+
 var model;
 function buildModel() {
   model = [];
@@ -136,6 +143,9 @@ function mirrorHolidayValue(cell) {
       mirroredContent.textContent = value || '\u00a0';
     }
   });
+
+  var trs = new Set(holiday.cells.map(cell => cell.closest('tr')));
+  trs.forEach(recalculateTotal);
 }
 
 })();
