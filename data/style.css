@@ -67,7 +67,7 @@ label {
   padding: .2em .5em;
 }
 
-.has-content, [contenteditable=true]:focus {
+.has-content, [contenteditable=true]:focus, [data-persist] {
   border: 1px solid #ccc;
 }
 

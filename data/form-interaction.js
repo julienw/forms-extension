@@ -48,12 +48,17 @@ function attachUnlinkHandlers() {
 
 function attachEmptyCellHandler() {
   table.addEventListener('click', (e) => {
+    if (e.target.isContentEditable) {
+      return;
+    }
+
     var target = e.target.closest('.holiday-cell');
     if (!target) {
       return;
     }
     var content = target.querySelector('[contenteditable]');
     content.focus();
+    window.getSelection().selectAllChildren(content);
   });
 }
 
