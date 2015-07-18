@@ -5,6 +5,7 @@ var templates = {
 };
 
 var weeks;
+var holidays;
 var range = document.querySelector('.easy-selector-range');
 var form = document.querySelector('.choose-weeks-form');
 var sections = {
@@ -28,12 +29,27 @@ function initFakeData() {
   }
 }
 
-function show(holidays) {
+/**
+ * @typedef {Object} HolidayWeek
+ * @property {Date} start
+ * @property {Date} end
+ * @property {Date} holidayStart
+ * @property {Date} holidayEnd
+ * @property {String} [type] Only the type of the first week in a holiday is
+ * taken into account.
+ *
+ * @typedef {Array.<HolidayWeek>} Holiday
+ */
+/**
+ * @param {Array.<Holiday>} holifays
+ */
+function show(aHolidays) {
   weeks = [];
+  holidays = aHolidays;
 
-  holidays.forEach(holiday => {
+  holidays.forEach((holiday, holidayIdx) => {
     holiday.forEach(week => {
-      week.holidayWeek = getHolidayWeek(week);
+      week.holidayWeek = getHolidayWeek(week, holidayIdx);
       //delete week.holidayStart;
       //delete week.holidayEnd;
       weeks.push(week);
@@ -103,8 +119,14 @@ function generatePTOForm() {
       weekEndUS: week.end.toLocaleDateString('en-US')
     };
 
-    interpolateData.total = week.holidayWeek.filter((isHoliday, i) => {
-      interpolateData[`day${i}`] = isHoliday || '';
+    interpolateData.total = week.holidayWeek.filter((holidayIdx, i) => {
+      var isHoliday = holidayIdx >= 0;
+
+      interpolateData[`day${i}`] =
+        isHoliday ?
+        holidays[holidayIdx][0].type || 'CP' :
+        '';
+
       return isHoliday;
     }).length;
 
@@ -159,9 +181,9 @@ function findFuture(weeks) {
  * Returns an array of 5 elements, with booleans indicating whether each day of
  * the week is part of the holiday.
  *
- * @returns {Array.<Boolean>}
+ * @returns {Array.<Integer>} < 0 if it's not an holiday, or the holiday index
  */
-function getHolidayWeek(week) {
+function getHolidayWeek(week, holidayIdx) {
   // convert back from json
   ['start', 'end', 'holidayStart', 'holidayEnd'].forEach(prop => {
     week[prop] = new Date(week[prop]);
@@ -173,7 +195,7 @@ function getHolidayWeek(week) {
     var curDate = new Date(+week.start);
     curDate.setUTCDate(firstDay + i);
     var isHoliday = week.holidayStart <= curDate && curDate <= week.holidayEnd;
-    holidayWeek[i] = isHoliday && (week.type || 'CP');
+    holidayWeek[i] = isHoliday ? holidayIdx : -1;
   }
   return holidayWeek;
 }
