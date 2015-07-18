@@ -8,9 +8,11 @@ attachHighlightHandlers();
 attachUnlinkHandlers();
 attachDisplayedHandler();
 attachInputHandler();
+attachEmptyCellHandler();
 
 function attachInputHandler() {
   table.addEventListener('input', onInput);
+  table.addEventListener('input', Utils.throttle(onThrottledInput, 500));
 }
 
 function attachHighlightHandlers() {
@@ -44,6 +46,17 @@ function attachUnlinkHandlers() {
   });
 }
 
+function attachEmptyCellHandler() {
+  table.addEventListener('click', (e) => {
+    var target = e.target.closest('.holiday-cell');
+    if (!target) {
+      return;
+    }
+    var content = target.querySelector('[contenteditable]');
+    content.focus();
+  });
+}
+
 function getHolidayIndexFromDataset(cell) {
   var holidayIdx = cell.dataset.holidayIndex;
   if (!holidayIdx) {
@@ -58,11 +71,13 @@ function getHolidayIndexFromDataset(cell) {
   return holidayIdx;
 }
 
-function recalculateTotal(tr) {
-  var totalCell = tr.querySelector('.total');
-  var editableCells = tr.querySelectorAll('td [contenteditable="true"]');
-  var total = Array.from(editableCells).filter(cell => cell.textContent.trim()).length;
-  totalCell.textContent = total;
+function recalculateTotal() {
+  Array.from(table.querySelectorAll('tr')).forEach(tr => {
+    var totalCell = tr.querySelector('.total');
+    var editableCells = tr.querySelectorAll('td [contenteditable="true"]');
+    var total = Array.from(editableCells).filter(cell => cell.textContent.trim()).length;
+    totalCell.textContent = total;
+  });
 }
 
 var model;
@@ -96,6 +111,9 @@ function handleUnlink(cell) {
 
   if (holiday.linked) {
     mirrorHolidayValue(cell);
+    highlightHolidayFromCell(cell);
+  } else {
+    removeAllHighlights();
   }
 }
 
@@ -108,8 +126,6 @@ function highlightHolidayFromCell(cell) {
   var holiday = model[holidayIdx];
   if (holiday.linked) {
     holiday.cells.forEach(cell => cell.classList.add('cell-highlight'));
-  } else {
-    cell.classList.add('cell-highlight');
   }
 }
 
@@ -121,7 +137,14 @@ function removeAllHighlights() {
 
 function onInput(e) {
   if (e.target.isContentEditable) {
+    e.target.classList.toggle('has-content', e.target.textContent.trim());
     mirrorHolidayValue(e.target.closest('td'));
+  }
+}
+
+function onThrottledInput(e) {
+  if (e.target.isContentEditable) {
+    recalculateTotal();
   }
 }
 
@@ -141,11 +164,9 @@ function mirrorHolidayValue(cell) {
     if (mirroredCell !== cell) {
       var mirroredContent = mirroredCell.querySelector('[contenteditable="true"]');
       mirroredContent.textContent = value || '\u00a0';
+      mirroredContent.classList.toggle('has-content', value.trim());
     }
   });
-
-  var trs = new Set(holiday.cells.map(cell => cell.closest('tr')));
-  trs.forEach(recalculateTotal);
 }
 
 })();

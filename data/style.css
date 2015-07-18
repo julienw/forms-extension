@@ -10,7 +10,7 @@
   border-bottom: 1px solid #ccc;
 }
 
-.week-line:hover, .cell-highlight {
+.week-line:hover, .cell-highlight, .holiday-cell:hover {
   background: #f3f3f3;
 }
 
@@ -64,8 +64,11 @@ label {
 }
 
 [contenteditable=true] {
-  border: 1px solid #ccc;
   padding: .2em .5em;
+}
+
+.has-content, [contenteditable=true]:focus {
+  border: 1px solid #ccc;
 }
 
 .unlink-button {

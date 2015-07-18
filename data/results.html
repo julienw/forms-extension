@@ -106,9 +106,9 @@
       </tr>
     --></div>
     <div id='form-cell-template' hidden><!--
-      <td data-holiday-index='${holidayIndex}'>
+      <td class='holiday-cell' data-holiday-index='${holidayIndex}'>
         <button type='button' class='unlink-button' aria-title='This cell is linked to other cells for this holiday. Click to unlink.'></button>
-        <div contenteditable="${editable}">${type}</div>
+        <div contenteditable="true" class='${className}'>${type}</div>
       </td>
     --></div>
   </body>

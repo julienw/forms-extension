@@ -130,11 +130,11 @@ function generatePTOForm() {
 
       var cellData = {
         holidayIndex: holidayIdx,
-        editable: isHoliday,
+        className: isHoliday ? 'has-content' : '',
         type: 
           isHoliday ?
           holidays[holidayIdx][0].type || 'CP' :
-          ''
+          '\u00a0'
       };
 
       interpolateData.cells += templates.ptoCell.interpolate(cellData);
