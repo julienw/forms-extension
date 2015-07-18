@@ -63,10 +63,6 @@ label {
   width: 25em;
 }
 
-[contenteditable=true]:before {
-  content: ' ';
-}
-
 [contenteditable=true] {
   border: 1px solid #ccc;
   padding: .2em .5em;
@@ -93,4 +89,15 @@ label {
 
 .cell-unlinked .unlink-button {
   background-image: url(gimp-hchain-broken.png);
+}
+
+@media print {
+  [contenteditable=true] {
+    border: 0;
+    padding: 0;
+  }
+
+  .unlink-button {
+    display: none;
+  }
 }
