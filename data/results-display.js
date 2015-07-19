@@ -24,6 +24,11 @@ initRange();
 initForm();
 initFuture();
 initFakeData();
+initCommunication();
+
+function initCommunication() {
+  window.addEventListener('show-holidays', (e) => show(e.detail));
+}
 
 function initFakeData() {
   if (window.location.protocol !== 'resource:') {
