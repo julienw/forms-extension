@@ -60,11 +60,12 @@ label {
 
 .worked-days-table td:first-child {
   /* force width for the first column */
-  width: 25em;
+  width: 22em;
 }
 
 [contenteditable=true] {
   padding: .2em .5em;
+  min-height: 1.2em;
 }
 
 .has-content, [contenteditable=true]:focus, [data-persist] {
@@ -92,6 +93,60 @@ label {
 
 .cell-unlinked .unlink-button {
   background-image: url(gimp-hchain-broken.png);
+}
+
+[lang|=en] {
+  font-weight: normal;
+  font-style: italic;
+}
+
+/* --- absence codes --- */
+.absence-codes {
+  border: 1px solid #888;
+  padding: .5em 1em;
+}
+
+dt {
+  position: absolute;
+  margin-bottom: .5em;
+}
+
+dd {
+  margin: 0 0 .5em 4em;
+}
+
+/* --- signature part --- */
+footer {
+  margin-top: 4em;
+  display: flex;
+}
+
+footer > div {
+  flex: 1 1 0;
+  margin: 0 1em;
+}
+
+.signature-box {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.signature {
+  border-bottom: 1px solid black;
+}
+
+.editable-name {
+  display: flex;
+  align-items: center;
+}
+
+.name-information {
+  margin-left: 1em;
+}
+
+footer [contenteditable="true"] {
+  min-width: 6em;
 }
 
 @media print {

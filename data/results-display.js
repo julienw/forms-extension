@@ -134,7 +134,7 @@ function generatePTOForm() {
         type: 
           isHoliday ?
           holidays[holidayIdx][0].type || 'CP' :
-          '\u00a0'
+          ''
       };
 
       interpolateData.cells += templates.ptoCell.interpolate(cellData);
@@ -149,6 +149,8 @@ function generatePTOForm() {
       )
     );
   });
+
+  document.querySelector('.date-value').textContent = new Date().toLocaleDateString();
   sections.pto.hidden = false;
 
   setTimeout(() => window.dispatchEvent(new CustomEvent('table-displayed')));

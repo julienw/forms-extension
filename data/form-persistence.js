@@ -17,6 +17,7 @@ function onInput(e) {
   if (persistKey) {
     var value = e.target.textContent;
     persist(persistKey, value);
+    displaySavedValue(persistKey, value, e.target);
   }
 }
 
@@ -29,8 +30,22 @@ function restoreSavedValues() {
   for (var i = 0; i < storageLength; i++) {
     var persistKey = localStorage.key(i);
     var value = localStorage.getItem(persistKey);
-    document.querySelector(`[data-persist=${persistKey}]`).textContent = value;
+    displaySavedValue(persistKey, value);
   }
+}
+
+/**
+ * @param {String} persistKey
+ * @param {String} value
+ * @param {Node} [excluded]
+ */
+function displaySavedValue(persistKey, value, excluded) {
+  var elements = document.querySelectorAll(`[data-persist=${persistKey}]`);
+  Array.from(elements).forEach(elt => {
+    if (elt !== excluded) {
+      elt.textContent = value;
+    }
+  });
 }
 
 })();

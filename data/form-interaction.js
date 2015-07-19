@@ -170,7 +170,7 @@ function mirrorHolidayValue(cell) {
   holiday.cells.forEach(mirroredCell => {
     if (mirroredCell !== cell) {
       var mirroredContent = mirroredCell.querySelector('[contenteditable="true"]');
-      mirroredContent.textContent = value || '\u00a0';
+      mirroredContent.textContent = value;
       mirroredContent.classList.toggle('has-content', value.trim());
     }
   });
