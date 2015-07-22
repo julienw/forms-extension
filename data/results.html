@@ -84,7 +84,7 @@
       <footer>
         <div class='date-information'>Date: <span class='date-value'></span></div>
         <div class='worker-signature signature-box'>
-          <span class='signature'></span>
+          <span class='signature' data-persist='employee-signature' data-persist-type='image'></span>
           <span class='editable-name'>
             <span data-persist='last-name' contenteditable='true'>
             </span>
@@ -92,7 +92,7 @@
           </span>
         </div>
         <div class='manager-signature signature-box'>
-          <span class='signature'></span>
+          <span class='signature' data-persist='manager-signature' data-persist-type='image'></span>
           <span class='editable-name'>
             <div data-persist='manager-last-name' contenteditable='true'>
             </div>
@@ -103,7 +103,7 @@
     </section>
 
     <section class='signature-editor' tabindex="-1" hidden>
-      <canvas class='signature-canvas' width='500' height='500'></canvas>
+      <canvas class='signature-canvas' width='320' height='64'></canvas>
       <div class='signature-editor-controls'>
         <button type='button' class='signature-editor-clear-button'>Clear</button>
         <button type='button' class='signature-editor-finish-button'>Finish</button>

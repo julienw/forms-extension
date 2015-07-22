@@ -138,6 +138,7 @@ footer > div {
 .signature {
   border-bottom: 1px solid black;
   padding-top: 4em;
+  background: no-repeat center / contain;
 }
 
 .editable-name {
@@ -186,6 +187,7 @@ footer [contenteditable="true"] {
 .signature-canvas {
   border: 1px solid black;
   background: white;
+  width: 80%;
 }
 
 .signature-editor-controls {

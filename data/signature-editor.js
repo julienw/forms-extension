@@ -5,6 +5,7 @@
 
 var editor = document.querySelector('.signature-editor');
 var canvas = document.querySelector('.signature-canvas');
+var persistKey;
 
 attachTriggeringListeners();
 attachDrawingListeners();
@@ -42,7 +43,9 @@ function attachControlsListeners() {
 
 function finishAndExit() {
   canvas.toBlob(blob => {
-    var event = new CustomEvent('editor-finished', { detail: blob });
+    var event = new CustomEvent(
+      'persist-value', { detail: { blob, persistKey } }
+    );
     window.dispatchEvent(event);
     exitEditor();
   });
@@ -62,13 +65,22 @@ function detachKeyboardListeners() {
   window.removeEventListener('keydown', onKey);
 }
 
-function enterEditor() {
+function enterEditor(e) {
+  persistKey = e.target.dataset.persist;
   editor.hidden = false;
+  setCanvasSize();
   editor.focus();
+}
+
+function setCanvasSize() {
+  var rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
 }
 
 function exitEditor() {
   clearEditor();
+  persistKey = null;
   editor.hidden = true;
 }
 
@@ -82,6 +94,7 @@ function startDrawing(e) {
   canvas.setCapture(true);
   canvas.addEventListener('mousemove', drawLine);
   ctx = canvas.getContext('2d');
+  ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(e.offsetX, e.offsetY);
 }
