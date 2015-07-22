@@ -22,16 +22,19 @@ function onInput(e) {
 }
 
 function persist(key, value) {
-  localStorage.setItem(key, value);
+  asyncStorage.setItem(key, value);
 }
 
 function restoreSavedValues() {
-  var storageLength = localStorage.length;
-  for (var i = 0; i < storageLength; i++) {
-    var persistKey = localStorage.key(i);
-    var value = localStorage.getItem(persistKey);
-    displaySavedValue(persistKey, value);
-  }
+  asyncStorage.length((l) => {
+    for (var i = 0; i < l; i++) {
+      asyncStorage.key(i, (persistKey) => {
+        asyncStorage.getItem(persistKey, (value) => {
+          displaySavedValue(persistKey, value);
+        });
+      });
+    }
+  });
 }
 
 /**
