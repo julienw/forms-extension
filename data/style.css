@@ -121,7 +121,7 @@ footer {
 }
 
 footer > div {
-  flex: 1 1 0;
+  flex: auto;
   margin: 0 1em;
 }
 
@@ -133,6 +133,8 @@ footer > div {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+
+  flex: 1 0 18em;
 }
 
 .signature {
@@ -155,6 +157,10 @@ footer [contenteditable="true"] {
 }
 
 @media print {
+  html, body {
+    font-size: 10px;
+  }
+
   [contenteditable=true] {
     border: 0;
     padding: 0;
@@ -187,7 +193,6 @@ footer [contenteditable="true"] {
 .signature-canvas {
   border: 1px solid black;
   background: white;
-  width: 80%;
 }
 
 .signature-editor-controls {
