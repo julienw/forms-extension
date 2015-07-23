@@ -147,6 +147,7 @@ function generatePTOForm() {
       return isHoliday;
     }).length;
 
+    /* Data is sanitized by the Template library. */
     ptoTable.insertAdjacentHTML(
       'beforeend',
       templates.ptoRow.interpolate(
@@ -228,6 +229,7 @@ function displayWeeks() {
   var form = document.querySelector('.choose-weeks-form');
   var opts = { day: "numeric", month: 'long', year: "numeric" };
   weeks.forEach((week, id) => {
+    /* Data is sanitized by the Template library. */
     form.insertAdjacentHTML('beforeend', templates.week.interpolate({
       id,
       weekStart: week.start,
