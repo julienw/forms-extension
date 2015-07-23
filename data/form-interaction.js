@@ -81,6 +81,9 @@ function getHolidayIndexFromDataset(cell) {
 function recalculateTotal() {
   Array.from(table.querySelectorAll('tr')).forEach(tr => {
     var totalCell = tr.querySelector('.total');
+    if (!totalCell) {
+      return;
+    }
     var editableCells = tr.querySelectorAll('td [contenteditable="true"]');
     var total = Array.from(editableCells).filter(cell => cell.textContent.trim()).length;
     totalCell.textContent = total;
