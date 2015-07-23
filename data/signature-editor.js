@@ -68,15 +68,20 @@ function detachKeyboardListeners() {
 function enterEditor(e) {
   persistKey = e.target.dataset.persist;
   var existingData = e.target.dataset.blobUrl;
+  if (existingData) {
+    drawImage(existingData);
+  }
   editor.hidden = false;
-  setCanvasSize();
   editor.focus();
 }
 
-function setCanvasSize() {
-  var rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
+function drawImage(url) {
+  var img = new Image();
+  img.src = url;
+  img.onload = function() {
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(this, 0, 0);
+  };
 }
 
 function exitEditor() {
@@ -96,6 +101,7 @@ function startDrawing(e) {
   canvas.addEventListener('mousemove', drawLine);
   ctx = canvas.getContext('2d');
   ctx.lineWidth = 2;
+  ctx.lineCap = 'round'; // otherwise simple points are not drawn
   ctx.beginPath();
   ctx.moveTo(e.offsetX, e.offsetY);
 }

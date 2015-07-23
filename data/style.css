@@ -10,8 +10,8 @@
   border-bottom: 1px solid #ccc;
 }
 
-.week-line:hover, .cell-highlight, .holiday-cell:hover {
-  background: #f3f3f3;
+.week-line:hover, .cell-highlight, .holiday-cell:hover, .signature:hover {
+  background-color: #f3f3f3;
 }
 
 .week-line.selected {
