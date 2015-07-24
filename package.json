@@ -1,9 +1,11 @@
 {
   "name": "forms-extension",
-  "fullName": "forms-extension",
-  "id": "jid1-Ie0ShncwSkPKJg",
+  "title": "French Holiday Form Generator",
+  "id": "jid1-Ie0ShncwSkPKJg@jetpack",
   "description": "Used by french employees to generate their holiday form",
   "author": "Julien Wajsberg",
   "license": "MIT",
-  "version": "0.2"
+  "version": "1.0.0-pre1",
+  "homepage": "https://github.com/julienw/forms-extension",
+  "main": "lib/main.js"
 }
