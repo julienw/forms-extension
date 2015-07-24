@@ -71,7 +71,7 @@ function getHolidayIndexFromDataset(cell) {
   }
 
   holidayIdx = +holidayIdx;
-  if (!holidayIdx || holidayIdx < 0) {
+  if (holidayIdx < 0) {
     return null;
   }
 
