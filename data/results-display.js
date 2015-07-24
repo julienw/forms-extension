@@ -250,5 +250,10 @@ function camelCase(str) {
 }
 
 exports.generateForm = show;
+exports.Debug = {
+  debugMyData() {
+    return { weeks, holidays };
+  }
+};
 
 })(window);
