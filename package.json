@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/julienw/forms-extension#readme",
   "devDependencies": {
-    "jpm": "^1.0.0"
+    "jpm": "^1.0.0",
+    "semver": "^5.0.1"
   }
 }
