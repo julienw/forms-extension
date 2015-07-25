@@ -1,0 +1,25 @@
+{
+  "name": "forms-extension",
+  "version": "1.0.0-pre3",
+  "description": "Used by french employees to generate their holiday form",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/julienw/forms-extension.git"
+  },
+  "keywords": [
+    "addon"
+  ],
+  "author": "Julien Wajsberg",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/julienw/forms-extension/issues"
+  },
+  "homepage": "https://github.com/julienw/forms-extension#readme",
+  "devDependencies": {
+    "jpm": "^1.0.0"
+  }
+}
