@@ -13,6 +13,8 @@
 <script type="text/javascript" charset="utf-8">
 (function() {
 
+  // width / height
+  var ratio = 4;
   var container = document.querySelector('.main-container');
   var cropperPosition;
 
@@ -69,68 +71,140 @@ function createCropperElement({ top, left, width, height }) {
 
   cropperPosition = {
     top: 30,
+    bottom: 100,
     left: 30,
-    right: 100,
-    bottom: 100
+    right: 310,
   };
-  applyCropperPosition(div.firstElementChild);
 
-  attachCropperHandlers(div);
+  var cropper = div.firstElementChild;
+  applyCropperPosition(cropper);
+  attachCropperHandlers(cropper);
   return div;
 }
 
-function applyCropperPosition(cropper) {
-  var { top, left, right, bottom } = cropperPosition;
-  cropper.style.top = top + 'px';
-  cropper.style.left = left + 'px';
-  cropper.style.width = (right - left) + 'px';
-  cropper.style.height = (bottom - top) + 'px';
+function setCropperPosition(positionChange) {
+  var oldWidth = cropperPosition.right - cropperPosition.left;
+  var oldHeight = cropperPosition.bottom - cropperPosition.top;
+  var width = oldWidth + positionChange.right - positionChange.left;
+  var height = oldHeight + positionChange.bottom - positionChange.top;
+  
+  if (oldWidth === width && oldHeight === height) {
+    // case of moving without transforming
+    cropperPosition = {
+      top: cropperPosition.top + positionChange.top,
+      bottom: cropperPosition.bottom + positionChange.bottom,
+      left: cropperPosition.left + positionChange.left,
+      right: cropperPosition.right + positionChange.right
+    };
+    return;
+  }
+
+  if (oldWidth > oldHeight && (positionChange.left || positionChange.right)) {
+    height = Math.round(width / ratio);
+  } else if (positionChange.bottom || positionChange.top) {
+    width = height * ratio;
+  } else if (positionChange.left || positionChange.right) {
+    height = Math.round(width / ratio);
+  }
+
+  var dimensionChanges = {
+    width: width - oldWidth,
+    height: height - oldHeight
+  };
+
+  // TODO This needs fixing:
+  if (positionChange.bottom || positionChange.right) {
+    positionChange = {
+      top: 0,
+      left: 0,
+      bottom: dimensionChanges.height,
+      right: dimensionChanges.width
+    };
+  } else if (positionChange.left || positionChange.top) {
+    positionChange = {
+      bottom: 0,
+      right: 0,
+      top: -dimensionChanges.height,
+      left: -dimensionChanges.width
+    };
+  }
+
+  console.log('positionChange after using ratio', positionChange);
+
+  console.log('old cropperPosition', cropperPosition);
+  cropperPosition = {
+    top: cropperPosition.top + positionChange.top,
+    bottom: cropperPosition.bottom + positionChange.bottom,
+    left: cropperPosition.left + positionChange.left,
+    right: cropperPosition.right + positionChange.right
+  };
+  console.log('new cropperPosition', cropperPosition);
 }
 
+var existingAnimationRequest;
+function applyCropperPosition(cropper) {
+  cancelAnimationFrame(existingAnimationRequest);
+  existingAnimationRequest = requestAnimationFrame(() => {
+    var { top, left, right, bottom } = cropperPosition;
+    cropper.style.top = top + 'px';
+    cropper.style.left = left + 'px';
+    cropper.style.width = (right - left) + 'px';
+    cropper.style.height = (bottom - top) + 'px';
+  });
+}
+
+var currentHandle;
 function onCropperHandlerStart(e) {
-  var handle = e.target;
-  handle.setCapture(true);
-  handle.addEventListener('mousemove', onCropperHandlerMove);
+  currentHandle = e.target;
+  currentHandle.setCapture(true);
+  currentHandle.addEventListener('mousemove', onCropperHandlerMove);
 }
 
 function onCropperHandlerMove(e) {
+  var positionChange = {
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0
+  };
+
   var classList = e.target.classList;
   if (classList.contains('cropper-handle-n') ||
       classList.contains('cropper-handle-ne') ||
-      classList.contains('cropper-handle-nw')) {
-    cropperPosition.top = e.clientY;
+      classList.contains('cropper-handle-nw') ||
+      classList.contains('cropper')) {
+    positionChange.top = e.movementY;
   }
 
   if (classList.contains('cropper-handle-s') ||
       classList.contains('cropper-handle-se') ||
-      classList.contains('cropper-handle-sw')) {
-    cropperPosition.bottom = e.clientY;
+      classList.contains('cropper-handle-sw') ||
+      classList.contains('cropper')) {
+    positionChange.bottom = e.movementY;
   }
 
   if (classList.contains('cropper-handle-w') ||
       classList.contains('cropper-handle-sw') ||
-      classList.contains('cropper-handle-nw')) {
-    cropperPosition.left = e.clientX;
+      classList.contains('cropper-handle-nw') ||
+      classList.contains('cropper')) {
+    positionChange.left = e.movementX;
   }
 
   if (classList.contains('cropper-handle-e') ||
       classList.contains('cropper-handle-se') ||
-      classList.contains('cropper-handle-ne')) {
-    cropperPosition.right = e.clientX;
+      classList.contains('cropper-handle-ne') ||
+      classList.contains('cropper')) {
+    positionChange.right = e.movementX;
   }
 
-  if (classList.contains('cropper')) {
-    cropperPosition.top += e.movementY;
-    cropperPosition.bottom += e.movementY;
-    cropperPosition.left += e.movementX;
-    cropperPosition.right += e.movementX;
-  }
-
+  console.log('positionChange', positionChange);
+  setCropperPosition(positionChange);
   applyCropperPosition(document.querySelector('.cropper'));
 }
 
 function onCropperHandlerEnd(e) {
-  e.target.removeEventListener('mousemove', onCropperHandlerMove);
+  currentHandle.removeEventListener('mousemove', onCropperHandlerMove);
+  currentHandle = null;
 }
 
 function attachCropperHandlers(cropper) {
