@@ -115,8 +115,7 @@ td [contenteditable=true] {
 }
 
 dt {
-  position: absolute;
-  margin-bottom: .5em;
+  float: left;
 }
 
 dd {

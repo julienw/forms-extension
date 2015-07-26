@@ -33,9 +33,9 @@ function initCommunication() {
 function initFakeData() {
   if (window.location.protocol !== 'resource:') {
     // we're not in the addon
-    range.value = 10;
+    range.value = 15;
     show(fakeData);
-    generatePTOForm();
+    //generatePTOForm();
   }
 }
 
