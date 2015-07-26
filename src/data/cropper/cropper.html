@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+  <link rel='stylesheet' href='cropper.css'/>
+
+</head>
+<body>
+  <button class='import-button' type='button'>Import</button>
+  <div class='main-container' hidden>
+  </div>
+<script type="text/javascript" charset="utf-8">
+(function() {
+
+  var container = document.querySelector('.main-container');
+  var cropperPosition;
+
+  function createInputFile({ accept }) {
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = accept;
+  return input;
+}
+
+function onEvent(elt, eventName) {
+  return new Promise(resolve => {
+    elt.addEventListener(eventName, function onEvent() {
+      elt.removeEventListener(eventName, onEvent);
+      resolve();
+    });
+  });
+}
+
+function onChange(elt) { return onEvent(elt, 'change'); }
+
+function handleImport(file) {
+  console.log(file);
+  var img = new Image();
+  img.src = window.URL.createObjectURL(file);
+  img.onload = function() {
+    window.URL.revokeObjectURL(img.src);
+    startImageCropper(img);
+  };
+  container.appendChild(img);
+  container.hidden = false;
+}
+
+function createCropperElement({ top, left, width, height }) {
+  var div = document.createElement('div');
+  div.className = 'cropper-container';
+  div.style.left = left + 'px';
+  div.style.top = top + 'px';
+  div.style.width = width + 'px';
+  div.style.height = height + 'px';
+
+  div.innerHTML = `
+    <div class='cropper'>
+      <div class='cropper-handle cropper-handle-n'></div>
+      <div class='cropper-handle cropper-handle-s'></div>
+      <div class='cropper-handle cropper-handle-e'></div>
+      <div class='cropper-handle cropper-handle-w'></div>
+      <div class='cropper-handle cropper-handle-ne'></div>
+      <div class='cropper-handle cropper-handle-se'></div>
+      <div class='cropper-handle cropper-handle-nw'></div>
+      <div class='cropper-handle cropper-handle-sw'></div>
+    </div>
+  `;
+
+  cropperPosition = {
+    top: 30,
+    left: 30,
+    right: 100,
+    bottom: 100
+  };
+  applyCropperPosition(div.firstElementChild);
+
+  attachCropperHandlers(div);
+  return div;
+}
+
+function applyCropperPosition(cropper) {
+  var { top, left, right, bottom } = cropperPosition;
+  cropper.style.top = top + 'px';
+  cropper.style.left = left + 'px';
+  cropper.style.width = (right - left) + 'px';
+  cropper.style.height = (bottom - top) + 'px';
+}
+
+function onCropperHandlerStart(e) {
+  var handle = e.target;
+  handle.setCapture(true);
+  handle.addEventListener('mousemove', onCropperHandlerMove);
+}
+
+function onCropperHandlerMove(e) {
+  var classList = e.target.classList;
+  if (classList.contains('cropper-handle-n') ||
+      classList.contains('cropper-handle-ne') ||
+      classList.contains('cropper-handle-nw')) {
+    cropperPosition.top = e.clientY;
+  }
+
+  if (classList.contains('cropper-handle-s') ||
+      classList.contains('cropper-handle-se') ||
+      classList.contains('cropper-handle-sw')) {
+    cropperPosition.bottom = e.clientY;
+  }
+
+  if (classList.contains('cropper-handle-w') ||
+      classList.contains('cropper-handle-sw') ||
+      classList.contains('cropper-handle-nw')) {
+    cropperPosition.left = e.clientX;
+  }
+
+  if (classList.contains('cropper-handle-e') ||
+      classList.contains('cropper-handle-se') ||
+      classList.contains('cropper-handle-ne')) {
+    cropperPosition.right = e.clientX;
+  }
+
+  if (classList.contains('cropper')) {
+    cropperPosition.top += e.movementY;
+    cropperPosition.bottom += e.movementY;
+    cropperPosition.left += e.movementX;
+    cropperPosition.right += e.movementX;
+  }
+
+  applyCropperPosition(document.querySelector('.cropper'));
+}
+
+function onCropperHandlerEnd(e) {
+  e.target.removeEventListener('mousemove', onCropperHandlerMove);
+}
+
+function attachCropperHandlers(cropper) {
+  cropper.addEventListener('mousedown', onCropperHandlerStart);
+  cropper.addEventListener('mouseup', onCropperHandlerEnd);
+}
+
+function startImageCropper(img) {
+  var rect = img.getBoundingClientRect();
+  var cropper = createCropperElement(rect);
+  document.body.appendChild(cropper);
+}
+
+var button = document.querySelector('.import-button');
+button.addEventListener('click', () => {
+  var input = createInputFile({ accept: 'image/*' });
+  onChange(input).then(() => handleImport(input.files[0]));
+  input.click();
+});
+
+})();
+</script>
+</body>
+</html>

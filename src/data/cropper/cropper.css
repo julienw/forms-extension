@@ -1,0 +1,96 @@
+.main-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: grey;
+}
+
+.main-container[hidden] {
+  display: none;
+}
+
+.main-container img {
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.cropper-container {
+  position: absolute;
+
+}
+
+.cropper {
+  position: absolute;
+
+  border: 2px dashed black;
+
+  cursor: move;
+}
+
+.cropper-handle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: yellow;
+
+  margin: -3px;
+
+}
+
+.cropper-handle-n {
+  top: 0;
+  left: 50%;
+
+  cursor: ns-resize;
+}
+
+.cropper-handle-e {
+  top: 50%;
+  right: 0;
+
+  cursor: ew-resize;
+}
+
+.cropper-handle-w {
+  top: 50%;
+  left: 0;
+
+  cursor: ew-resize;
+}
+
+.cropper-handle-s {
+  bottom: 0;
+  left: 50%;
+
+  cursor: ns-resize;
+}
+
+.cropper-handle-nw {
+  top: 0;
+  left: 0;
+
+  cursor: nwse-resize;
+}
+
+.cropper-handle-sw {
+  bottom: 0;
+  left: 0;
+
+  cursor: nesw-resize;
+}
+
+.cropper-handle-ne {
+  top: 0;
+  right: 0;
+
+  cursor: nesw-resize;
+}
+
+.cropper-handle-se {
+  bottom: 0;
+  right: 0;
+
+  cursor: nwse-resize;
+}
