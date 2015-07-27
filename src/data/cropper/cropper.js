@@ -1,48 +1,14 @@
 /*jshint esnext:true */
-(function() {
+(function(exports) {
 
-  // width / height
-  var ratio = 4;
-  var container = document.querySelector('.main-container');
-  var cropperPosition;
+// width / height
+var ratio = null;
+var cropperPosition;
+var cropperContainer;
 
-  function createInputFile({ accept }) {
-  var input = document.createElement('input');
-  input.type = 'file';
-  input.accept = accept;
-  return input;
-}
-
-function onEvent(elt, eventName) {
-  return new Promise(resolve => {
-    elt.addEventListener(eventName, function onEvent() {
-      elt.removeEventListener(eventName, onEvent);
-      resolve();
-    });
-  });
-}
-
-function onChange(elt) { return onEvent(elt, 'change'); }
-
-function handleImport(file) {
-  var img = new Image();
-  img.src = window.URL.createObjectURL(file);
-  img.onload = function() {
-    window.URL.revokeObjectURL(img.src);
-    startImageCropper(img);
-  };
-  container.appendChild(img);
-  container.hidden = false;
-}
-
-function createCropperElement({ top, left, width, height }) {
+function createCropperElement() {
   var div = document.createElement('div');
   div.className = 'cropper-container';
-  div.style.left = left + 'px';
-  div.style.top = top + 'px';
-  div.style.width = width + 'px';
-  div.style.height = height + 'px';
-
   div.innerHTML = `
     <div class='cropper'>
       <div class='cropper-handle cropper-handle-n' data-position='n'></div>
@@ -198,17 +164,28 @@ function attachCropperHandlers(cropper) {
   cropper.addEventListener('mouseup', onCropperHandlerEnd);
 }
 
-function startImageCropper(img) {
-  var rect = img.getBoundingClientRect();
-  var cropper = createCropperElement(rect);
-  document.body.appendChild(cropper);
+function startImageCropper(img, aRatio) {
+  ratio = aRatio;
+  if (!cropperContainer) {
+    cropperContainer = createCropperElement();
+    document.body.appendChild(cropperContainer);
+  }
+
+  var { left, top, width, height } = img.getBoundingClientRect();
+  cropperContainer.style.left = left + 'px';
+  cropperContainer.style.top = top + 'px';
+  cropperContainer.style.width = width + 'px';
+  cropperContainer.style.height = height + 'px';
 }
 
-var button = document.querySelector('.import-button');
-button.addEventListener('click', () => {
-  var input = createInputFile({ accept: 'image/*' });
-  onChange(input).then(() => handleImport(input.files[0]));
-  input.click();
-});
+function closeCropper() {
+  cropperContainer.remove();
+  cropperContainer = null;
+}
 
-})();
+exports.Cropper = {
+  start: startImageCropper,
+  getPosition: () => cropperPosition,
+  close: closeCropper
+};
+})(window);
