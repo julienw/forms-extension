@@ -37,10 +37,6 @@ label {
   display: none;
 }
 
-.easy-selector-range::-moz-range-track {
-  background: #ddd; /* workaround for GTK3 bug 1187237 -- it makes it ugly though */
-}
-
 /** table styling **/
 
 .worked-days-table {
