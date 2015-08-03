@@ -12,9 +12,7 @@ function init() {
     id: 'forms-extension',
     label: 'generate forms',
     icon: {
-      16: "./icon-16.png",
-      32: "./icon-32.png",
-      48: "./icon-48.png"
+      20: "./icon-128.png"
     },
     onClick: generate
   });
@@ -95,7 +93,10 @@ function getAllHolidays(url) {
     });
 
     return holidays;
-  }).catch(e => console.error('got error while retrieving document:', e));
+  }).catch(e => {
+    console.error('got error while retrieving document:', e);
+    throw e;
+  });
 }
 
 /**

@@ -82,10 +82,10 @@ td [contenteditable=true] {
   top: 0;
   right: 0;
 
-  width: 2em;
-  height: 1em;
+  width: 2.6em;
+  height: 1.1em;
 
-  background: url(gimp-hchain.png) center no-repeat;
+  background: url(linked.png) center no-repeat;
   border: 0;
 
   cursor: pointer;
@@ -96,7 +96,7 @@ td [contenteditable=true] {
 }
 
 .cell-unlinked .unlink-button {
-  background-image: url(gimp-hchain-broken.png);
+  background-image: url(unlinked.png);
 }
 
 [lang|=en] {
