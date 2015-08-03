@@ -122,6 +122,7 @@ function handleUnlink(cell) {
   if (holiday.linked) {
     mirrorHolidayValue(cell);
     highlightHolidayFromCell(cell);
+    recalculateTotal();
   } else {
     removeAllHighlights();
   }
