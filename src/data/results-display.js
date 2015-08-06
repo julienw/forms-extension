@@ -119,7 +119,8 @@ function generatePTOForm() {
     var isChecked = input.checked;
 
     return (!isFuture || includeFuture) && isChecked;
-  });
+  }).sort((a, b) => a.start - b.start);
+
   weeksToDisplay.forEach((week, id) => {
     var interpolateData = {
       id,
