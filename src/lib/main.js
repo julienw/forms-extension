@@ -11,9 +11,7 @@ function init() {
   ActionButton({
     id: 'forms-extension',
     label: 'generate forms',
-    icon: {
-      20: "./icon-128.png"
-    },
+    icon: './icon-128.png',
     onClick: generate
   });
 }
