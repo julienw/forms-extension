@@ -85,7 +85,15 @@ function recalculateTotal() {
       return;
     }
     var editableCells = tr.querySelectorAll('td [contenteditable="true"]');
-    var total = Array.from(editableCells).filter(cell => cell.textContent.trim()).length;
+    var total = Array.from(editableCells).reduce((result, cell) => {
+      var content = cell.textContent.trim();
+      var shouldCount = content && content !== 'JF';
+      if (shouldCount) {
+        var diff = (content.indexOf('.5') === -1) ? 1 : 0.5;
+        return result + diff;
+      }
+      return result;
+    }, 0);
     totalCell.textContent = total;
   });
 }
