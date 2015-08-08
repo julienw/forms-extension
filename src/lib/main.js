@@ -11,7 +11,7 @@ function init() {
   ActionButton({
     id: 'forms-extension',
     label: 'generate forms',
-    icon: './icon-128.png',
+    icon: './icon-opt.svg',
     onClick: generate
   });
 }

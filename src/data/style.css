@@ -80,12 +80,12 @@ td [contenteditable=true] {
   position: absolute;
 
   top: 0;
-  right: 0;
+  right: 0.5em;
 
-  width: 2.6em;
-  height: 1.1em;
+  width: 1.5em;
+  height: 1em;
 
-  background: url(linked.png) center no-repeat;
+  background: url(linked-opt.svg) center / contain no-repeat;
   border: 0;
 
   cursor: pointer;
@@ -96,7 +96,7 @@ td [contenteditable=true] {
 }
 
 .cell-unlinked .unlink-button {
-  background-image: url(unlinked.png);
+  background-image: url(unlinked-opt.svg);
 }
 
 [lang|=en] {
