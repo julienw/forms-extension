@@ -48,17 +48,17 @@ function getFrenchBankHolidays(year) {
   ];
 
   let holidays = FIXED_HOLIDAYS.slice();
-  
+
   // Include easter Monday
   var easter = _easter(year);
   var easterMonday = new Date(easter.getYear(), easter.getMonth(), easter.getDate() + 1);
-  
+
   holidays.push([easterMonday.getMonth() + 1, easterMonday.getDate(), "Easter monday"]);
-  
+
   // Include ascension
   var ascensionThursday = new Date(easter.getYear(), easter.getMonth(), easter.getDate() + 39);
   holidays.push([ascensionThursday.getMonth() + 1, ascensionThursday.getDate(), "Ascension Thursday"]);
-  
+
   // Include whitMonday
   // At Mozilla France we do work during Whit Monday.
   // var whitMonday = new Date(easter.getYear(), easter.getMonth(), easter.getDate() + 50);
@@ -66,6 +66,29 @@ function getFrenchBankHolidays(year) {
 
   return holidays;
 }
+
+function getBoxingDays(year, holidays) {
+  var boxing = [];
+
+  var nextNewYear = new Date(year + 1, 1, 1);
+  if (nextNewYear.getDay() === 6) {
+    boxing.push([12, 31, "New Years Day (Observed)"]);
+  }
+
+  holidays.forEach(holiday => {
+    var holidayDate = new Date(year, holiday[0] - 1, holiday[1]);
+    if (holidayDate.getDay() == 6) {
+      var previousFriday = new Date(year, holiday[0] - 1, holiday[1] - 1);
+      boxing.push([previousFriday.getMonth() + 1, previousFriday.getDate(), holiday[2] + " (observed)"]);
+    }
+    if (holidayDate.getDay() == 0) {
+      var nextMonday = new Date(year, holiday[0] - 1, holiday[1] + 1);
+      boxing.push([nextMonday.getMonth() + 1, nextMonday.getDate(), holiday[2] + " (observed)"]);
+    }
+  });
+  return boxing;
+}
 exports.getFrenchBankHolidays = getFrenchBankHolidays;
+exports.getBoxingDays = getBoxingDays;
 
 })(window);
