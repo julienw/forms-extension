@@ -34,11 +34,11 @@
               </tr>
               <tr>
                   <th>Nombre de jours ouvrés dans le mois<br/>(<em lang='en'>Number of week-day of the month</em>) </th>
-                  <td class='number' id='total-working-days'>23</td>
+                  <td class='number' id='total-working-days'>22</td>
               </tr>
               <tr>
                   <th>Total de jours travaillés <b>JT</b><br/>(<em lang='en'>Total number of days worked</em>)</th>
-                  <td class='number' id='total-worked-days'>23</td>
+                  <td class='number' id='total-worked-days'>22</td>
               </tr>
               <tr>
                   <th>Nombre de jours fériés <b>JF</b><br/>(<em lang='en'>Number of Bank holidays</em>)</th>
@@ -62,7 +62,7 @@
               </tr>
           </tbody>
       </table>
-      
+
       <table class='worked-days-table'>
         <thead>
           <tr>
@@ -72,7 +72,6 @@
             <th>Mercredi <em lang='en'>(Wednesday)</em></th>
             <th>Jeudi <em lang='en'>(Thursday)</em></th>
             <th>Vendredi <em lang='en'>(Friday)</em></th>
-            <th>Total</th>
           </tr>
         </thead>
       </table>
@@ -121,11 +120,10 @@
           <div lang='en'>Week from <span class='from'>${weekStartUS}</span> to <span class='to'>${weekEndUS}</span></div>
         </th>
         ${cells}
-        <td class='total'>${total}</td>
       </tr>
     --></div>
     <div id='form-cell-template' hidden><!--
-      <td class='holiday-cell' data-holiday-index='${holidayIndex}'>
+      <td class='holiday-cell'>
         <button type='button' class='unlink-button' aria-title='This cell is linked to other cells for this holiday. Click to unlink.'></button>
         <div contenteditable="true" class='${className}'>${type}</div>
       </td>

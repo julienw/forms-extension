@@ -172,7 +172,7 @@ function mirrorHolidayValue(cell) {
   if (holidayIdx === null) {
     return;
   }
-  
+
   var holiday = model[holidayIdx];
   if (!holiday.linked) {
     return;

@@ -8,7 +8,6 @@ var templates = {
   ptoCell: new Template('form-cell-template')
 };
 
-var weeks;
 var currentMonth;
 var currentYear;
 var holidays;
@@ -40,8 +39,8 @@ function initData() {
 
 function initFakeData() {
   if (window.location.protocol !== 'resource:') {
-    currentMonth = 12;
-    currentYear = 2015;
+    currentMonth = 1;
+    currentYear = 2017;
     generatePTOForm();
   }
 }
@@ -55,7 +54,7 @@ function monthWeekTable(year, month_number) {
   var used = firstOfMonth.getDay() + 6 + lastOfMonth.getDate();
   var numberOfWeeks = Math.ceil( used / 7);
 
-  weeks = [];
+  var weeks = [];
   for (var i = 0; i < numberOfWeeks; i++) {
     weeks.push([{}, {}, {}, {}, {}, {}, {}]);
   }
@@ -68,56 +67,68 @@ function monthWeekTable(year, month_number) {
 
   console.log(month_number, year);
 
-  for (var i = firstWeekDayOfMonth; i < numberOfDayInMonth + firstWeekDayOfMonth; i++) {
-    currentDayOfWeek = i % 7;
-    currentWeekNumber = Math.floor(i / 7);
+  weeks.forEach((week, weekIndex) => {
+    week.forEach((day, dayIndex) => {
+      var weekHasDays = false;
+      var globalIndex = weekIndex * 7 + dayIndex;
+      var dayOfMonth = globalIndex - firstWeekDayOfMonth + 1;
 
-    console.log(i - firstWeekDayOfMonth, currentWeekNumber, currentDayOfWeek);
-    weeks[currentWeekNumber][currentDayOfWeek] = i - firstWeekDayOfMonth + 1;
-    
-  }
+      day.date = new Date(year, month_number-1, dayOfMonth);
+
+      if ([0, 6].includes(day.date.getDay())) {
+        day.type = 'WE';
+      } else if (day.date.getMonth() === month_number - 1) {
+        day.type = 'JT';
+      } else {
+        day.type = null;
+      }
+    });
+  });
+
   console.log(JSON.stringify(weeks, null, 2));
+
+  return weeks;
 }
 
 
 function generatePTOForm() {
-  
-    
-  var weeksToDisplay = weeks.filter((week, id) => {
-    var includeFuture = future.checked;
-    var isFuture = week.future;
-    var input = document.querySelector(`.week-${id} input`);
-    var isChecked = input.checked;
+  var weeksToDisplay = monthWeekTable(currentYear, currentMonth)
+      .filter(week => week.some(day => ![null, 'WE'].includes(day.type)));
 
-    return (!isFuture || includeFuture) && isChecked;
-  }).sort((a, b) => a.start - b.start);
+  console.log(weeksToDisplay);
 
-  weeksToDisplay.forEach((week, id) => {
+  weeksToDisplay.forEach((week, week_id) => {
+    var days = week.filter((i) => i !== null);
+    console.log(days);
+    var firstDay = days[0].date;
+    var lastDay = days[days.length - 1].date;
     var interpolateData = {
-      id,
-      weekStart: week.start.toLocaleDateString(),
-      weekEnd: week.end.toLocaleDateString(),
-      weekStartUS: week.start.toLocaleDateString('en-US'),
-      weekEndUS: week.end.toLocaleDateString('en-US'),
+      id: week_id,
+      weekStart: firstDay.toLocaleDateString(),
+      weekEnd: lastDay.toLocaleDateString(),
+      weekStartUS: firstDay.toLocaleDateString('en-US'),
+      weekEndUS: lastDay.toLocaleDateString('en-US'),
       cells: ''
     };
 
-    interpolateData.total = week.holidayWeek.filter((holidayIdx, i) => {
-      var isHoliday = holidayIdx >= 0;
-
-      var cellData = {
-        holidayIndex: holidayIdx,
-        className: isHoliday ? 'has-content' : '',
-        type: 
-          isHoliday ?
-          holidays[holidayIdx][0].type || 'CP' :
-          ''
-      };
-
-      interpolateData.cells += templates.ptoCell.interpolate(cellData);
-
-      return isHoliday;
-    }).length;
+    week.forEach((day, day_id) => {
+      var cellData;
+      if (!day.type) {
+        cellData = {
+          id: 'day-' + week_id + '_' + day_id,
+          className: '',
+          type: ''
+        };
+        interpolateData.cells += templates.ptoCell.interpolate(cellData);
+      } else  if (![0, 6].includes(day.date.getDay())) {
+        cellData = {
+          id: 'day-' + week_id + '_' + day_id,
+          className: 'has-content',
+          type: day.type
+        };
+        interpolateData.cells += templates.ptoCell.interpolate(cellData);
+      }
+    });
 
     /* Data is sanitized by the Template library. */
     ptoTable.insertAdjacentHTML(
