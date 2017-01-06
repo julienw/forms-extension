@@ -4,12 +4,13 @@
 'use strict';
 
 var templates = {
-  week: new Template('week-template'),
   ptoRow: new Template('form-row-template'),
   ptoCell: new Template('form-cell-template')
 };
 
 var weeks;
+var currentMonth;
+var currentYear;
 var holidays;
 var range = document.querySelector('.easy-selector-range');
 var form = document.querySelector('.choose-weeks-form');
@@ -20,98 +21,68 @@ var sections = {
 var future = document.querySelector('.show-future-checkbox');
 var ptoTable = document.querySelector('.worked-days-table');
 
-initRange();
-initForm();
-initFuture();
+initData();
 initFakeData();
-initCommunication();
 
-function initCommunication() {
-  window.addEventListener('show-holidays', (e) => show(e.detail));
+
+function initData() {
+  // Setup default value
+  if (currentMonth == undefined || currentYear == undefined) {
+    var today = new Date();
+    currentMonth = today.getMonth();
+    currentYear = today.getYear();
+    if (currentMonth === 0) {
+      currentMonth = 12;
+      --currentYear;
+    }
+  }
 }
 
 function initFakeData() {
   if (window.location.protocol !== 'resource:') {
-    // we're not in the addon
-    range.value = 15;
-    show(fakeData);
-    //generatePTOForm();
+    currentMonth = 12;
+    currentYear = 2015;
+    generatePTOForm();
   }
 }
 
-/**
- * @typedef {Object} HolidayWeek
- * @property {Date} start
- * @property {Date} end
- * @property {Date} holidayStart
- * @property {Date} holidayEnd
- * @property {String} [type] Only the type of the first week in a holiday is
- * taken into account.
- *
- * @typedef {Array.<HolidayWeek>} Holiday
- */
-/**
- * @param {Array.<Holiday>} aHolidays
- */
-function show(aHolidays) {
+function monthWeekTable(year, month_number) {
+
+  // month_number is in the range 1..12
+
+  var firstOfMonth = new Date(year, month_number-1, 1);
+  var lastOfMonth = new Date(year, month_number, 0);
+  var used = firstOfMonth.getDay() + 6 + lastOfMonth.getDate();
+  var numberOfWeeks = Math.ceil( used / 7);
+
   weeks = [];
-  holidays = aHolidays;
+  for (var i = 0; i < numberOfWeeks; i++) {
+    weeks.push([{}, {}, {}, {}, {}, {}, {}]);
+  }
 
-  holidays.forEach((holiday, holidayIdx) => {
-    holiday.forEach(week => {
-      week.holidayWeek = getHolidayWeek(week, holidayIdx);
-      //delete week.holidayStart;
-      //delete week.holidayEnd;
-      weeks.push(week);
-    });
-  });
+  var firstWeekDayOfMonth = (firstOfMonth.getDay() - 1 + 7) % 7;
+  var numberOfDayInMonth = lastOfMonth.getDate();
 
-  weeks = sortAndMerge(weeks);
-  findFuture(weeks);
-  configureRange();
-  displayWeeks();
-  onRangeChange();
+  var currentDayOfWeek = firstWeekDayOfMonth;
+  var currentWeekNumber = 0;
+
+  console.log(month_number, year);
+
+  for (var i = firstWeekDayOfMonth; i < numberOfDayInMonth + firstWeekDayOfMonth; i++) {
+    currentDayOfWeek = i % 7;
+    currentWeekNumber = Math.floor(i / 7);
+
+    console.log(i - firstWeekDayOfMonth, currentWeekNumber, currentDayOfWeek);
+    weeks[currentWeekNumber][currentDayOfWeek] = i - firstWeekDayOfMonth + 1;
+    
+  }
+  console.log(JSON.stringify(weeks, null, 2));
 }
 
-function onRangeChange() {
-  weeks.forEach((week, id) => {
-    var limit = range.valueAsNumber;
-    var input = document.querySelector(`.week-${id} input`);
-    input.checked = id < limit;
-    onCheckboxChange(input);
-  });
-}
-
-function initRange() {
-  range.addEventListener('input', onRangeChange);
-}
-
-function onCheckboxChange(checkbox) {
-  checkbox.parentNode.classList.toggle('selected', checkbox.checked);
-}
-
-function initForm() {
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    generatePTOForm();
-  });
-
-  form.addEventListener('change', (e) => {
-    if (e.target.matches('input[type=checkbox]')) {
-      onCheckboxChange(e.target);
-    }
-  });
-}
-
-function initFuture() {
-  future.addEventListener('change', () => {
-    form.classList.toggle('hide-future', !future.checked);
-  });
-}
 
 function generatePTOForm() {
-  sections.choose.hidden = true;
+  
+    
   var weeksToDisplay = weeks.filter((week, id) => {
     var includeFuture = future.checked;
     var isFuture = week.future;
@@ -161,10 +132,6 @@ function generatePTOForm() {
   sections.pto.hidden = false;
 
   setTimeout(() => window.dispatchEvent(new CustomEvent('table-displayed')));
-}
-
-function configureRange() {
-  range.max = weeks.length;
 }
 
 /**

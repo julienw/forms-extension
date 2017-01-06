@@ -14,16 +14,6 @@
     <script defer src='signature-editor.js'></script>
   </head>
   <body>
-    <section class='choose-form'>
-      <form class='choose-weeks-form hide-future'>
-        <div class='controls'>
-          <button>Generate form</button>
-          <input type='range' class='easy-selector-range' value='0'></input>
-          <label><input type='checkbox' class='show-future-checkbox'> Show future</label>
-        </div>
-      </form>
-    </section>
-
     <!-- PTO FORM -->
     <section class='pto-form' hidden>
       <h1>Feuille auto-déclarative des salariés en forfait-jours</h1>
@@ -47,7 +37,7 @@
                   <td class='number' id='total-working-days'>23</td>
               </tr>
               <tr>
-                  <th>Total de jours travaillés<br/>(<em lang='en'>Total number of days worked</em>)</th>
+                  <th>Total de jours travaillés <b>JT</b><br/>(<em lang='en'>Total number of days worked</em>)</th>
                   <td class='number' id='total-worked-days'>23</td>
               </tr>
               <tr>
@@ -123,12 +113,6 @@
         <button type='button' class='signature-editor-cancel-button'>Cancel</button>
       </div>
     </section>
-
-    <div id='week-template' hidden><!--
-    <label class='week-line week-${id} ${futureClass}' data-start='${weekStart}' data-end='${weekEnd}'>
-      <input type='checkbox'> Semaine du ${weekStartText} au ${weekEndText}
-    </label>
-    --></div>
 
     <div id='form-row-template' hidden><!--
       <tr class='absence-row'>
