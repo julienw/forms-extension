@@ -39,7 +39,7 @@ function initData() {
 
 function initFakeData() {
   if (window.location.protocol !== 'resource:') {
-    currentMonth = 1;
+    currentMonth = 5;
     currentYear = 2017;
     generatePTOForm();
   }
@@ -67,6 +67,13 @@ function monthWeekTable(year, month_number) {
 
   console.log(month_number, year);
 
+  let zfill = (val) => ("0" + val).slice(-2);
+
+  var bankHolidays = getFrenchBankHolidays(year)
+      .map(holiday => year + "-" + zfill(holiday[0]) + "-" + zfill(holiday[1]));
+
+  console.log(bankHolidays.sort());
+
   weeks.forEach((week, weekIndex) => {
     week.forEach((day, dayIndex) => {
       var weekHasDays = false;
@@ -78,7 +85,13 @@ function monthWeekTable(year, month_number) {
       if ([0, 6].includes(day.date.getDay())) {
         day.type = 'WE';
       } else if (day.date.getMonth() === month_number - 1) {
-        day.type = 'JT';
+        var currentDate = year + "-" + zfill(day.date.getMonth() + 1) + "-" + zfill(dayOfMonth);
+        console.log(currentDate);
+        if (bankHolidays.includes(currentDate)) {
+          day.type = 'JF';
+        } else {
+          day.type = 'JT';
+        }
       } else {
         day.type = null;
       }
