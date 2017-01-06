@@ -101,7 +101,7 @@ function generatePTOForm() {
     var days = week.filter((i) => i !== null);
     console.log(days);
     var firstDay = days[0].date;
-    var lastDay = days[days.length - 1].date;
+    var lastDay = days[days.length - 3].date;
     var interpolateData = {
       id: week_id,
       weekStart: firstDay.toLocaleDateString(),
