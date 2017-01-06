@@ -25,13 +25,53 @@
 
     <!-- PTO FORM -->
     <section class='pto-form' hidden>
-      <h1>Décompte des heures de travail plafonné en jours sur l'année</h1>
-      <h2 lang='en'>Monitoring form of working hours capped in days over the year</h2>
-      <div class='worker-information'>
-        <div class='who'>Nom (<em lang='en'>name</em>): <span class='last-name' contenteditable='true' data-persist='last-name'>Lastname</span></div>
-        <div>Poste (<em lang='en'>position</em>): <span class='position' contenteditable='true' data-persist='position'>Engineer</span></div>
-      </div>
-
+      <h1>Feuille auto-déclarative des salariés en forfait-jours</h1>
+      <h2 lang='en'>Auto-declarative form for autonomous executives — 218 days of work per year scheme</h2>
+      <table class='summary'>
+          <tbody>
+              <tr>
+                  <th>Nom (<em lang='en'>Lastname</em>)</th>
+                  <td><span class='lastname' contenteditable='true' data-persist='lastname'>Lastname</span></td>
+              </tr>
+              <tr>
+                  <th>Prénom (<em lang='en'>Firstname</em>)</th>
+                  <td><span class='firstname' contenteditable='true' data-persist='firstname'>Firstname</span></td>
+              </tr>
+              <tr>
+                  <th>Mois (<em lang='en'>month</em>)</th>
+                  <td id='month'>December 2016</td>
+              </tr>
+              <tr>
+                  <th>Nombre de jours ouvrés dans le mois<br/>(<em lang='en'>Number of week-day of the month</em>) </th>
+                  <td class='number' id='total-working-days'>23</td>
+              </tr>
+              <tr>
+                  <th>Total de jours travaillés<br/>(<em lang='en'>Total number of days worked</em>)</th>
+                  <td class='number' id='total-worked-days'>23</td>
+              </tr>
+              <tr>
+                  <th>Nombre de jours fériés <b>JF</b><br/>(<em lang='en'>Number of Bank holidays</em>)</th>
+                  <td class='number' id='total-bank-holidays'>0</td>
+              </tr>
+              <tr>
+                  <th>Nombre de jours maladie <b>M</b><br/>(<em lang='en'>Number of Sick days</em>)</th>
+                  <td class='number' id='number-sick-days'>0</td>
+              </tr>
+              <tr>
+                  <th>Nombre de jours de congés payés pris <b>CP</b><br/>(<em lang='en'>Number of vacation days</em>)</th>
+                  <td class='number' id='total-vacation-days'>0</td>
+              </tr>
+              <tr>
+                  <th>Nombre de jours non travaillés au titre de la RTT <b>JRTT</b><br/>(<em lang='en'>Number of days off in the frame work of the working time reduction</em>)</th>
+                  <td class='number' id='total-rtt-days'>0</td>
+              </tr>
+              <tr>
+                  <th>Nombre de congés spéciaux <b>CS</b><br/>(<em lang='en'>Number of special days off</em>)</th>
+                  <td class='number' id='total-special-days'>0</td>
+              </tr>
+          </tbody>
+      </table>
+      
       <table class='worked-days-table'>
         <thead>
           <tr>
@@ -45,41 +85,35 @@
           </tr>
         </thead>
       </table>
-      <p>
-        Dans la limite de 220 jours par an et sous réserve du respect des
-        congés d'ancienneté.
-      </p>
-      <p lang='en'>
-        Within the limit of 220 days per year and subject to the
-        compliance with seniority vacation.
-      </p>
       <section class='absence-codes'>
         <h3>
           Codes d'absence
           <em lang='en'>(Absence codes)</em>
         </h3>
         <dl>
+          <dt>JT</dt>
+          <dd>Jours Travaillés <span lang='en'>(Days worked)</span></dd>
+          <dt>JF</dt>
+          <dd>Jours Fériés <span lang='en'>(Bank Holiday)</span></dd>
           <dt>CP</dt>
           <dd>Congés payés <span lang='en'>(Paid vacation)</span></dd>
-          <dt>JF</dt>
-          <dd>Jour férié <span lang='en'>(Rest day)</span></dd>
-          <dt>A</dt>
-          <dd>Anniversaire <span lang='en'>(B-day day off)</span></dd>
+          <dt>CS</dt>
+          <dd>Congés spéciaux (Anniversaire, Boxing day) <span lang='en'>(Special days Birthday, Boxing days, etc.)</span></dd>
           <dt>CSS</dt>
-          <dd>Congé sans solde <span lang='en'>(Unpaid leave)</span></dd>
-          <dt>R</dt>
-          <dd>Jour RTT</dd>
+          <dd>Congés sans solde <span lang='en'>(Unpaid leave)</span></dd>
+          <dt>JRTT</dt>
+          <dd>Jours RTT</dd>
           <dt>M</dt>
-          <dd>Arrêt maladie <span lang='en'>(Sickness)</span></dd>
+          <dd>Arrêts maladie <span lang='en'>(Sickness)</span></dd>
         </dl>
       </section>
       <p>
         A retourner à Doris Coleman chaque mois, après avoir été validé par votre
-        supérieur hiérarchique.
+        supérieur hiérarchique au plus tard dans les 5 premiers jours du mois suivant.
       </p>
       <p lang='en'>
         To be returned to Doris Coleman each month, after having been duly validated
-        by your Manager.
+        by your Manager within the first 5 days of the following month.
       </p>
       <footer>
         <div class='date-information'>Date: <span class='date-value'></span></div>
