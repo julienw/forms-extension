@@ -91,7 +91,6 @@ describe("French Bank Holidays", () => {
           [11, 10, 'Armistice Day (observed)'],
         ]);
       });
-
     });
   });
 });

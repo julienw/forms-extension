@@ -107,12 +107,36 @@ function monthWeekTable(year, month_number) {
   return weeks;
 }
 
+function changeMonthUp() {
+  console.log("Entering changeMonthUp");
+  currentMonth++;
+  if (currentMonth > 12) {
+    currentMonth = 1;
+    currentYear++;
+  }
+  generatePTOForm();
+}
+
+function changeMonthDown() {
+  console.log("Entering changeMonthDown");
+  currentMonth--;
+  if (currentMonth < 1) {
+    currentMonth = 12;
+    currentYear--;
+  }
+  generatePTOForm();
+}
 
 function generatePTOForm() {
+  console.log(currentYear, currentMonth);
   var weeksToDisplay = monthWeekTable(currentYear, currentMonth)
       .filter(week => week.some(day => ![null, 'WE'].includes(day.type)));
 
-  console.log(weeksToDisplay);
+  ptoTable.innerHTML = '';
+
+  var currentMonthDate = new Date(currentYear, currentMonth - 1, 1);
+
+  document.querySelector('#month').textContent = currentMonthDate.toLocaleString('en-us', {month: "long", year: "numeric"});
 
   weeksToDisplay.forEach((week, week_id) => {
     var days = week.filter((i) => i !== null);
@@ -245,7 +269,8 @@ function camelCase(str) {
   });
 }
 
-exports.generateForm = show;
+exports.changeMonthUp = changeMonthUp;
+exports.changeMonthDown = changeMonthDown;
 exports.Debug = {
   debugMyData() {
     return { weeks, holidays };
