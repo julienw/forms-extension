@@ -5,7 +5,8 @@
 
 var templates = {
   ptoRow: new Template('form-row-template'),
-  ptoCell: new Template('form-cell-template')
+  ptoCell: new Template('form-cell-template'),
+  ptoSummary: new Template('form-summary-template')
 };
 
 var currentMonth;
@@ -18,7 +19,8 @@ var sections = {
   pto: document.querySelector('.pto-form')
 };
 var future = document.querySelector('.show-future-checkbox');
-var ptoTable = document.querySelector('.worked-days-table');
+var ptoTable = document.querySelector('.worked-days-table tbody');
+var ptoSummaryTable = document.querySelector('.summary');
 
 initData();
 initFakeData();
@@ -136,7 +138,12 @@ function generatePTOForm() {
 
   var currentMonthDate = new Date(currentYear, currentMonth - 1, 1);
 
-  document.querySelector('#month').textContent = currentMonthDate.toLocaleString('en-us', {month: "long", year: "numeric"});
+  var interpolateSummaryData = {
+    month: currentMonthDate.toLocaleString('en-us', {month: "long", year: "numeric"}),
+  };
+
+  ptoSummaryTable.innerHTML = templates.ptoSummary.interpolate(interpolateSummaryData);
+  
 
   weeksToDisplay.forEach((week, week_id) => {
     var days = week.filter((i) => i !== null);

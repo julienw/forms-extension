@@ -23,48 +23,6 @@
       <h1>Feuille auto-déclarative des salariés en forfait-jours</h1>
       <h2 lang='en'>Auto-declarative form for autonomous executives — 218 days of work per year scheme</h2>
       <table class='summary'>
-          <tbody>
-              <tr>
-                  <th>Nom (<em lang='en'>Lastname</em>)</th>
-                  <td><span class='lastname' contenteditable='true' data-persist='lastname'>Lastname</span></td>
-              </tr>
-              <tr>
-                  <th>Prénom (<em lang='en'>Firstname</em>)</th>
-                  <td><span class='firstname' contenteditable='true' data-persist='firstname'>Firstname</span></td>
-              </tr>
-              <tr>
-                  <th>Mois (<em lang='en'>month</em>)</th>
-                  <td id='month'>December 2016</td>
-              </tr>
-              <tr>
-                  <th>Nombre de jours ouvrés dans le mois<br/>(<em lang='en'>Number of week-day of the month</em>) </th>
-                  <td class='number' id='total-working-days'>22</td>
-              </tr>
-              <tr>
-                  <th>Total de jours travaillés <b>JT</b><br/>(<em lang='en'>Total number of days worked</em>)</th>
-                  <td class='number' id='total-worked-days'>22</td>
-              </tr>
-              <tr>
-                  <th>Nombre de jours fériés <b>JF</b><br/>(<em lang='en'>Number of Bank holidays</em>)</th>
-                  <td class='number' id='total-bank-holidays'>0</td>
-              </tr>
-              <tr>
-                  <th>Nombre de jours maladie <b>M</b><br/>(<em lang='en'>Number of Sick days</em>)</th>
-                  <td class='number' id='number-sick-days'>0</td>
-              </tr>
-              <tr>
-                  <th>Nombre de jours de congés payés pris <b>CP</b><br/>(<em lang='en'>Number of vacation days</em>)</th>
-                  <td class='number' id='total-vacation-days'>0</td>
-              </tr>
-              <tr>
-                  <th>Nombre de jours non travaillés au titre de la RTT <b>JRTT</b><br/>(<em lang='en'>Number of days off in the frame work of the working time reduction</em>)</th>
-                  <td class='number' id='total-rtt-days'>0</td>
-              </tr>
-              <tr>
-                  <th>Nombre de congés spéciaux <b>CS</b><br/>(<em lang='en'>Number of special days off</em>)</th>
-                  <td class='number' id='total-special-days'>0</td>
-              </tr>
-          </tbody>
       </table>
 
       <table class='worked-days-table'>
@@ -78,6 +36,8 @@
             <th>Vendredi <em lang='en'>(Friday)</em></th>
           </tr>
         </thead>
+        <tbody>
+        </tbody>
       </table>
       <p>
         A retourner à Doris Coleman chaque mois, après avoir été validé par votre
@@ -116,6 +76,51 @@
         <button type='button' class='signature-editor-cancel-button'>Cancel</button>
       </div>
     </section>
+
+    <div id='form-summary-template' hidden><!--
+        <tbody>
+            <tr>
+                <th>Nom (<em lang='en'>Lastname</em>)</th>
+                <td><span class='lastname' contenteditable='true' data-persist='lastname'>Lastname</span></td>
+            </tr>
+            <tr>
+                <th>Prénom (<em lang='en'>Firstname</em>)</th>
+                <td><span class='firstname' contenteditable='true' data-persist='firstname'>Firstname</span></td>
+            </tr>
+            <tr>
+                <th>Mois (<em lang='en'>month</em>)</th>
+                <td id='month'>${month}</td>
+            </tr>
+            <tr>
+                <th>Nombre de jours ouvrés dans le mois<br/>(<em lang='en'>Number of week-day of the month</em>) </th>
+                <td class='number' id='total-working-days'>22</td>
+            </tr>
+            <tr>
+                <th>Total de jours travaillés <b>JT</b><br/>(<em lang='en'>Total number of days worked</em>)</th>
+                <td class='number' id='total-worked-days'>22</td>
+            </tr>
+            <tr>
+                <th>Nombre de jours fériés <b>JF</b><br/>(<em lang='en'>Number of Bank holidays</em>)</th>
+                <td class='number' id='total-bank-holidays'>0</td>
+            </tr>
+            <tr>
+                <th>Nombre de jours maladie <b>M</b><br/>(<em lang='en'>Number of Sick days</em>)</th>
+                <td class='number' id='number-sick-days'>0</td>
+            </tr>
+            <tr>
+                <th>Nombre de jours de congés payés pris <b>CP</b><br/>(<em lang='en'>Number of vacation days</em>)</th>
+                <td class='number' id='total-vacation-days'>0</td>
+            </tr>
+            <tr>
+                <th>Nombre de jours non travaillés au titre de la RTT <b>JRTT</b><br/>(<em lang='en'>Number of days off in the frame work of the working time reduction</em>)</th>
+                <td class='number' id='total-rtt-days'>0</td>
+            </tr>
+            <tr>
+                <th>Nombre de congés spéciaux <b>CS</b><br/>(<em lang='en'>Number of special days off</em>)</th>
+                <td class='number' id='total-special-days'>0</td>
+            </tr>
+        </tbody>
+    --></div>
 
     <div id='form-row-template' hidden><!--
       <tr class='absence-row'>
