@@ -1,5 +1,5 @@
 /*jshint esnext: true */
-(function() {
+(function(exports) {
 'use strict';
 
 var ptoForm = document.querySelector('.pto-form');
@@ -75,4 +75,5 @@ function displaySavedValue(persistKey, value, excluded) {
   });
 }
 
-})();
+exports.restoreSavedValues = restoreSavedValues;
+})(window);

@@ -35,7 +35,24 @@
 
   var state = getDefaultState();
   refreshWeeks();
+
+  // Load PTO data
+  initCommunication();
+  initFakeData();
+
   generatePTOForm();
+
+  function initCommunication() {
+    // Get back the PTO holidays from the PTO tool.
+    window.addEventListener('show-holidays', (e) => loadPTOData(e.detail, true));
+  }
+
+  function initFakeData() {
+    if (window.location.protocol !== 'resource:') {
+      // We're not in the addon
+      loadPTOData(fakeData, true);
+    }
+  }
 
   function getDefaultState() {
     var state = {};
@@ -53,7 +70,22 @@
     state.weeks = monthWeekTable(state.currentYear, state.currentMonth)
         .filter(week => week.some(day => ![null, 'WE'].includes(day.type)));
   }
-  
+
+  function loadPTOData(holidays, refresh) {
+    state.holidays = holidays;
+    if (state.hasOwnProperty("weeks")) {
+      updateWeeksWithHolidays();
+      if (refresh === true) {
+        generatePTOForm();
+      }
+    }
+  }
+
+  function zfill(val) {
+    return ("0" + val).slice(-2);
+  }
+
+
   function monthWeekTable(year, month_number) {
 
     // month_number is in the range 1..12
@@ -74,13 +106,13 @@
     var currentDayOfWeek = firstWeekDayOfMonth;
     var currentWeekNumber = 0;
 
-    let zfill = (val) => ("0" + val).slice(-2);
-
     var frenchBankHolidays = getFrenchBankHolidays(year)
     var bankHolidays = frenchBankHolidays
         .map(holiday => year + "-" + zfill(holiday[0]) + "-" + zfill(holiday[1]));
     var boxingDays = getBoxingDays(year, frenchBankHolidays)
         .map(holiday => year + "-" + zfill(holiday[0]) + "-" + zfill(holiday[1]));
+
+    if (year < 2017) boxingDays = [];
 
     weeks.forEach((week, weekIndex) => {
       week.forEach((day, dayIndex) => {
@@ -112,6 +144,56 @@
     return weeks;
   }
 
+  function updateWeeksWithHolidays() {
+    // Update the weeks data with the PTO infos for the current month.
+    state.holidays.forEach((holiday) => {
+      // Is in current month?
+      var start = new Date(holiday.start);
+      var end = new Date(holiday.end);
+
+      if (start.getMonth() <= state.currentMonth - 1 && start.getFullYear() <= state.currentYear &&
+          end.getMonth() >= state.currentMonth -1 && end.getFullYear() >= state.currentYear) {
+        // Someday of this holiday are in the current month
+        var hours = holiday.hours;
+        var type = guessTypeFromComment(holiday.comment) || 'CP';
+
+        state.weeks.forEach((week, weekIndex) => {
+          week.forEach((day, dayIndex) => {
+            var currentDayText = day.date.getFullYear() + '-' + zfill(day.date.getMonth() - 1) + '-' + zfill(day.date.getDate());
+            var startDayText = start.getFullYear() + '-' + zfill(start.getMonth() - 1) + '-' + zfill(start.getDate());
+            var endDayText = end.getFullYear() + '-' + zfill(end.getMonth() - 1) + '-' + zfill(end.getDate());
+
+            if (startDayText <= currentDayText && endDayText >= currentDayText) {
+              if (day.type !== 'WE') {
+                if (WORKING_DAY_TYPES.includes(day.type)) {
+                  day.type = type;
+                  // If there is still more than 8 hours, it is probably a full day off
+                  if (hours > 8) {
+                    hours -= 8;
+                  } else if (hours > 0) {
+                    // If there is less, it is probably an half day off.
+                    day.hours = hours;
+                    hours = 0;
+                  }
+                } else {
+                  // A CS or JF is always 8 hours
+                  hours -= 8;
+                }
+              }
+            }
+          });
+        });
+      }
+    });
+  }
+
+  function guessTypeFromComment(comment) {
+    var KNOWN_TYPES = ['RTT', 'CP', 'JF', 'CS', 'M'];
+    var type = KNOWN_TYPES.find(type => comment && comment.includes(type));
+    if (type == 'RTT') type = 'JRTT';
+    return type;
+  }
+
   function changeMonthUp() {
     state.currentMonth++;
     if (state.currentMonth > 12) {
@@ -119,6 +201,7 @@
       state.currentYear++;
     }
     refreshWeeks();
+    updateWeeksWithHolidays();
     generatePTOForm();
   }
 
@@ -129,6 +212,7 @@
       state.currentYear--;
     }
     refreshWeeks();
+    updateWeeksWithHolidays();
     generatePTOForm();
   }
 
@@ -188,7 +272,7 @@
           if (WORKING_DAY_TYPES.includes(day.type)) {
             summary.totalWorkingDays++;
           }
-          
+
           cellData = {
             id: 'day-' + week_id + '_' + day_id,
             className: 'has-content',
@@ -215,6 +299,7 @@
     sections.pto.hidden = false;
 
     setTimeout(() => window.dispatchEvent(new CustomEvent('table-displayed')));
+    restoreSavedValues();
   }
 
   /**

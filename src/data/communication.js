@@ -9,4 +9,3 @@ self.port.on(
     document.documentElement.dispatchEvent(event);
   }
 );
-

@@ -36,9 +36,7 @@ function generate() {
     0
   ));
 
-  getAllHolidays(ptoWebsiteUrl).then(
-    holidays => holidays.map(findWeeksForHoliday)
-  ).then(showResults);
+  getAllHolidays(ptoWebsiteUrl).then(showResults);
 }
 
 /**
@@ -80,6 +78,7 @@ function getAllHolidays(url) {
   return getDocumentAtUrl(url).then(document => {
     var lines = document.querySelectorAll('tbody > tr');
     var holidays = Array.from(lines).map((line) => {
+      var txtHours = parseInt(line.children[1].textContent, 10);
       var txtStartDate = line.children[2].textContent;
       var txtEndDate = line.children[3].textContent;
       var txtComment = line.children[4].textContent;
@@ -87,7 +86,7 @@ function getAllHolidays(url) {
       var startDate = new Date(txtStartDate + ' UTC');
       var endDate = new Date(txtEndDate + ' UTC');
 
-      return { start: startDate, end: endDate, comment: txtComment };
+      return { start: startDate, end: endDate, comment: txtComment, hours: textHours };
     });
 
     return holidays;
@@ -117,76 +116,6 @@ function authenticate(url) {
       }
     });
   });
-}
-
-function findWeeksForHoliday(holiday) {
-  var start = holiday.start;
-  var end = holiday.end;
-
-  var weeks = [];
-  var curDate = start;
-  while (end >= getWeekStart(curDate)) {
-    var week = getWorkingWeek(curDate);
-
-    if (start > week.end || end < week.start) {
-      // if start or end is outside a working week
-      curDate = nextWeek(curDate);
-      continue;
-    }
-
-    week.holidayStart = week.start;
-    week.holidayEnd = week.end;
-
-    if (start >= week.start) {
-      // the holiday start is in this week
-      week.holidayStart = start;
-    }
-
-    if (end <= week.end) {
-      // the holiday end is in this week
-      week.holidayEnd = end;
-    }
-
-    week.type = findHolidayType(holiday.comment);
-    weeks.push(week);
-    curDate = nextWeek(curDate);
-  }
-
-  return weeks;
-}
-
-var KNOWN_TYPES = ['R', 'CP', 'JF', 'A', 'CSS', 'M'];
-function findHolidayType(comment) {
-  return KNOWN_TYPES.find(type => comment && comment.startsWith(type + '.'));
-}
-
-function getWorkingWeek(date) {
-  var weekStart = new Date(+date);
-  var sundayDate = weekStart.getUTCDate() - weekStart.getUTCDay();
-  // monday
-  weekStart.setUTCDate(sundayDate + 1);
-
-  var weekEnd = new Date(+date);
-  // friday
-  weekEnd.setUTCDate(sundayDate + 5);
-
-  return {
-    start: weekStart,
-    end: weekEnd
-  };
-}
-
-function getWeekStart(date) {
-  var weekStart = new Date(+date);
-  var sundayDate = weekStart.getUTCDate() - weekStart.getUTCDay();
-  weekStart.setUTCDate(sundayDate);
-  return weekStart;
-}
-
-function nextWeek(date) {
-  var oneWeek = 7 * 24 * 60 * 60 * 1000;
-  var nextWeekDate = new Date(+date + oneWeek);
-  return nextWeekDate;
 }
 
 function showResults(holidays) {
