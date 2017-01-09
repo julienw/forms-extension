@@ -91,9 +91,11 @@
         day.date = new Date(year, month_number-1, dayOfMonth);
 
         if ([0, 6].includes(day.date.getDay())) {
+          day.hours = 8;
           day.type = 'WE';
         } else if (day.date.getMonth() === month_number - 1) {
           var currentDate = year + "-" + zfill(day.date.getMonth() + 1) + "-" + zfill(dayOfMonth);
+          day.hours = 8;
           if (bankHolidays.includes(currentDate)) {
             day.type = 'JF';
           } else if (boxingDays.includes(currentDate)) {
@@ -131,7 +133,13 @@
   }
 
   function updateModel(weekId, dayId, type) {
+    var nbHours = 8;
+    if (type.indexOf("0.5") === 0 || type.indexOf("1/2") === 0 || type.indexOf("0,5") === 0) {
+      nbHours = 4;
+    }
+    type = /[A-Z]+/.exec(type.toUpperCase())[0];
     state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].type = type;
+    state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].hours = nbHours;
     generatePTOForm();
   }
 
@@ -175,7 +183,8 @@
           interpolateData.cells += templates.ptoCell.interpolate(cellData);
         } else  if (![0, 6].includes(day.date.getDay())) {
           // Increment counters
-          summary[day.type]++;
+          summary[day.type] += day.hours / 8;
+          summary.JT += 1 - (day.hours / 8);
           if (WORKING_DAY_TYPES.includes(day.type)) {
             summary.totalWorkingDays++;
           }
@@ -183,7 +192,7 @@
           cellData = {
             id: 'day-' + week_id + '_' + day_id,
             className: 'has-content',
-            type: day.type,
+            type: (day.hours === 4 ? '0.5 ' : '') + day.type,
             weekId: week_id,
             dayId: day_id
           };
