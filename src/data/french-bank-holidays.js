@@ -37,7 +37,7 @@ function _easter (year, julian, gregorian) {
 
 function getFrenchBankHolidays(year) {
   const FIXED_HOLIDAYS = [
-    [1, 1, 'New year'],
+    [1, 1, 'New Years Day'],
     [5, 1, "Labour Day"],
     [5, 8, "Victory in Europe Day"],
     [7, 14, "Bastille Day"],
@@ -47,7 +47,7 @@ function getFrenchBankHolidays(year) {
     [12, 25, "Christmas Day"],
   ];
 
-  let holidays = FIXED_HOLIDAYS.slice();
+  let holidays = FIXED_HOLIDAYS.slice(0);
 
   // Include easter Monday
   var easter = _easter(year);
@@ -64,23 +64,33 @@ function getFrenchBankHolidays(year) {
   // var whitMonday = new Date(easter.getYear(), easter.getMonth(), easter.getDate() + 50);
   // holidays.push([whitMonday.getMonth() + 1, whitMonday.getDate(), "Whit Monday"]);
 
-  return holidays;
+  return holidays.slice(0).sort((previousDay, currentDay) => {
+    // Compare months
+    if (previousDay[0] < currentDay[0]) return -1;
+    if (previousDay[0] > currentDay[0]) return 1;
+    // Compare days
+    if (previousDay[1] < currentDay[1]) return -1;
+    if (previousDay[1] > currentDay[1]) return 1;
+    return 0;
+  });
 }
 
 function getBoxingDays(year, holidays) {
   var boxing = [];
 
-  var nextNewYear = new Date(year + 1, 1, 1);
+  var nextNewYear = new Date(year + 1, 0, 1);
   if (nextNewYear.getDay() === 6) {
-    boxing.push([12, 31, "New Years Day (Observed)"]);
+    boxing.push([12, 31, "New Years Day (observed)"]);
   }
 
   holidays.forEach(holiday => {
     var holidayDate = new Date(year, holiday[0] - 1, holiday[1]);
+    // When the holiday is a Saturday, the previous Friday is a holiday
     if (holidayDate.getDay() == 6) {
       var previousFriday = new Date(year, holiday[0] - 1, holiday[1] - 1);
       boxing.push([previousFriday.getMonth() + 1, previousFriday.getDate(), holiday[2] + " (observed)"]);
     }
+    // When the holiday is a Sunday, the next Monday is a holiday
     if (holidayDate.getDay() == 0) {
       var nextMonday = new Date(year, holiday[0] - 1, holiday[1] + 1);
       boxing.push([nextMonday.getMonth() + 1, nextMonday.getDate(), holiday[2] + " (observed)"]);
@@ -91,4 +101,4 @@ function getBoxingDays(year, holidays) {
 exports.getFrenchBankHolidays = getFrenchBankHolidays;
 exports.getBoxingDays = getBoxingDays;
 
-})(window);
+})(typeof window === 'object' ? window : exports);
