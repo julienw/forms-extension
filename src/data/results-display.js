@@ -164,6 +164,7 @@
             var endDayText = end.getFullYear() + '-' + zfill(end.getMonth() - 1) + '-' + zfill(end.getDate());
 
             if (startDayText <= currentDayText && endDayText >= currentDayText) {
+              var isLast = endDayText == currentDayText;
               if (day.type !== 'WE') {
                 if (WORKING_DAY_TYPES.includes(day.type)) {
                   day.type = type;
@@ -171,9 +172,14 @@
                   if (hours > 8) {
                     hours -= 8;
                   } else if (hours > 0) {
-                    // If there is less, it is probably an half day off.
-                    day.hours = hours;
-                    hours = 0;
+                    if (!isLast) {
+                      day.hours = 4;
+                      hours -= 4;
+                    } else {
+                      // If there is less, it is probably an half day off.
+                      day.hours = hours;
+                      hours = 0;
+                    }
                   }
                 } else {
                   // A CS or JF is always 8 hours

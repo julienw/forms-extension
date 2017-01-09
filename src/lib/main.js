@@ -86,7 +86,7 @@ function getAllHolidays(url) {
       var startDate = new Date(txtStartDate + ' UTC');
       var endDate = new Date(txtEndDate + ' UTC');
 
-      return { start: startDate, end: endDate, comment: txtComment, hours: textHours };
+      return { start: startDate, end: endDate, comment: txtComment, hours: txtHours };
     });
 
     return holidays;
