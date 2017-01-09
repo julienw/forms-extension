@@ -43,19 +43,20 @@
     if (currentMonth == undefined || currentYear == undefined) {
       var today = new Date();
       currentMonth = today.getMonth();
-      currentYear = today.getYear();
+      currentYear = today.getFullYear();
       if (currentMonth === 0) {
         currentMonth = 12;
         --currentYear;
       }
     }
+    generatePTOForm();
   }
 
   function initFakeData() {
     if (window.location.protocol !== 'resource:') {
-      currentMonth = 1;
-      currentYear = 2017;
-      generatePTOForm();
+      // currentMonth = 1;
+      // currentYear = 2017;
+      // generatePTOForm();
     }
   }
 
