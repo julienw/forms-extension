@@ -12,7 +12,7 @@ attachEmptyCellHandler();
 
 function attachInputHandler() {
   table.addEventListener('input', onInput);
-  table.addEventListener('input', Utils.throttle(onThrottledInput, 500));
+  table.addEventListener('input', Utils.throttle(onThrottledInput.bind(null, updateModel), 2000));
 }
 
 function attachHighlightHandlers() {
@@ -157,35 +157,21 @@ function removeAllHighlights() {
 function onInput(e) {
   if (e.target.isContentEditable) {
     e.target.classList.toggle('has-content', e.target.textContent.trim());
-    mirrorHolidayValue(e.target.closest('td'));
   }
 }
 
-function onThrottledInput(e) {
+function onThrottledInput(callback, e) {
   if (e.target.isContentEditable) {
-    recalculateTotal();
+    mirrorHolidayValue(e.target.closest('td'), callback);
   }
 }
 
-function mirrorHolidayValue(cell) {
-  var holidayIdx = getHolidayIndexFromDataset(cell);
-  if (holidayIdx === null) {
-    return;
-  }
-
-  var holiday = model[holidayIdx];
-  if (!holiday.linked) {
-    return;
-  }
-
-  var value = cell.querySelector('[contenteditable="true"]').textContent;
-  holiday.cells.forEach(mirroredCell => {
-    if (mirroredCell !== cell) {
-      var mirroredContent = mirroredCell.querySelector('[contenteditable="true"]');
-      mirroredContent.textContent = value;
-      mirroredContent.classList.toggle('has-content', value.trim());
-    }
-  });
+function mirrorHolidayValue(cell, callback) {
+  var input = cell.querySelector('[contenteditable="true"]')
+  var weekId = input.dataset.week;
+  var dayId = input.dataset.day;
+  var value = input.textContent.trim();
+  callback(weekId, dayId, value.trim());
 }
 
 })();

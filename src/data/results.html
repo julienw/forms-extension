@@ -133,8 +133,7 @@
     --></div>
     <div id='form-cell-template' hidden><!--
       <td class='holiday-cell'>
-        <button type='button' class='unlink-button' aria-title='This cell is linked to other cells for this holiday. Click to unlink.'></button>
-        <div contenteditable="true" class='${className}'>${type}</div>
+        <div contenteditable="true" class='${className}' data-week='${weekId}' data-day='${dayId}'>${type}</div>
       </td>
     --></div>
   </body>

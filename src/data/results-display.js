@@ -9,9 +9,8 @@
     ptoSummary: new Template('form-summary-template')
   };
 
-  var currentMonth;
-  var currentYear;
-  var holidays;
+  var state = {};
+  var weeks;
   var range = document.querySelector('.easy-selector-range');
   var form = document.querySelector('.choose-weeks-form');
   var sections = {
@@ -34,32 +33,27 @@
     CS: 0,
   };
 
+  var state = getDefaultState();
+  refreshWeeks();
+  generatePTOForm();
 
-  initData();
-  initFakeData();
-
-  function initData() {
-    // Setup default value
-    if (currentMonth == undefined || currentYear == undefined) {
-      var today = new Date();
-      currentMonth = today.getMonth();
-      currentYear = today.getFullYear();
-      if (currentMonth === 0) {
-        currentMonth = 12;
-        --currentYear;
-      }
+  function getDefaultState() {
+    var state = {};
+    var today = new Date();
+    state.currentMonth = today.getMonth();
+    state.currentYear = today.getFullYear();
+    if (state.currentMonth === 0) {
+      state.currentMonth = 12;
+      --state.currentYear;
     }
-    generatePTOForm();
+    return state;
   }
 
-  function initFakeData() {
-    if (window.location.protocol !== 'resource:') {
-      // currentMonth = 1;
-      // currentYear = 2017;
-      // generatePTOForm();
-    }
+  function refreshWeeks() {
+    state.weeks = monthWeekTable(state.currentYear, state.currentMonth)
+        .filter(week => week.some(day => ![null, 'WE'].includes(day.type)));
   }
-
+  
   function monthWeekTable(year, month_number) {
 
     // month_number is in the range 1..12
@@ -80,8 +74,6 @@
     var currentDayOfWeek = firstWeekDayOfMonth;
     var currentWeekNumber = 0;
 
-    console.log(month_number, year);
-
     let zfill = (val) => ("0" + val).slice(-2);
 
     var frenchBankHolidays = getFrenchBankHolidays(year)
@@ -89,8 +81,6 @@
         .map(holiday => year + "-" + zfill(holiday[0]) + "-" + zfill(holiday[1]));
     var boxingDays = getBoxingDays(year, frenchBankHolidays)
         .map(holiday => year + "-" + zfill(holiday[0]) + "-" + zfill(holiday[1]));
-
-    console.log(bankHolidays.sort(), boxingDays.sort());
 
     weeks.forEach((week, weekIndex) => {
       week.forEach((day, dayIndex) => {
@@ -117,28 +107,31 @@
       });
     });
 
-    console.log(JSON.stringify(weeks, null, 2));
-
     return weeks;
   }
 
   function changeMonthUp() {
-    console.log("Entering changeMonthUp");
-    currentMonth++;
-    if (currentMonth > 12) {
-      currentMonth = 1;
-      currentYear++;
+    state.currentMonth++;
+    if (state.currentMonth > 12) {
+      state.currentMonth = 1;
+      state.currentYear++;
     }
+    refreshWeeks();
     generatePTOForm();
   }
 
   function changeMonthDown() {
-    console.log("Entering changeMonthDown");
-    currentMonth--;
-    if (currentMonth < 1) {
-      currentMonth = 12;
-      currentYear--;
+    state.currentMonth--;
+    if (state.currentMonth < 1) {
+      state.currentMonth = 12;
+      state.currentYear--;
     }
+    refreshWeeks();
+    generatePTOForm();
+  }
+
+  function updateModel(weekId, dayId, type) {
+    state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].type = type;
     generatePTOForm();
   }
 
@@ -151,18 +144,13 @@
   }
 
   function generatePTOForm() {
-    console.log(currentYear, currentMonth);
-    var weeksToDisplay = monthWeekTable(currentYear, currentMonth)
-        .filter(week => week.some(day => ![null, 'WE'].includes(day.type)));
-
     ptoTable.innerHTML = '';
 
-    var currentMonthDate = new Date(currentYear, currentMonth - 1, 1);
+    var currentMonthDate = new Date(state.currentYear, state.currentMonth - 1, 1);
     var summary = Object.assign({}, DEFAULT_SUMMARY_VALUES);
 
-    weeksToDisplay.forEach((week, week_id) => {
+    state.weeks.forEach((week, week_id) => {
       var days = week.filter((i) => i !== null);
-      console.log(days);
       var firstDay = days[0].date;
       var lastDay = days[days.length - 3].date;
       var interpolateData = {
@@ -180,7 +168,9 @@
           cellData = {
             id: 'day-' + week_id + '_' + day_id,
             className: '',
-            type: ''
+            type: '',
+            weekId: week_id,
+            dayId: day_id
           };
           interpolateData.cells += templates.ptoCell.interpolate(cellData);
         } else  if (![0, 6].includes(day.date.getDay())) {
@@ -193,7 +183,9 @@
           cellData = {
             id: 'day-' + week_id + '_' + day_id,
             className: 'has-content',
-            type: day.type
+            type: day.type,
+            weekId: week_id,
+            dayId: day_id
           };
           interpolateData.cells += templates.ptoCell.interpolate(cellData);
         }
@@ -301,6 +293,7 @@
 
   exports.changeMonthUp = changeMonthUp;
   exports.changeMonthDown = changeMonthDown;
+  exports.updateModel = updateModel;
   exports.Debug = {
     debugMyData() {
       return { weeks, holidays };
