@@ -246,8 +246,8 @@
       var lastDay = days[days.length - 3].date;
       var interpolateData = {
         id: week_id,
-        weekStart: firstDay.toLocaleDateString(),
-        weekEnd: lastDay.toLocaleDateString(),
+        weekStart: firstDay.toLocaleDateString("fr-FR"),
+        weekEnd: lastDay.toLocaleDateString("fr-FR"),
         weekStartUS: firstDay.toLocaleDateString('en-US'),
         weekEndUS: lastDay.toLocaleDateString('en-US'),
         cells: ''
@@ -295,7 +295,7 @@
     });
 
     setSummary(currentMonthDate, summary);
-    document.querySelector('.date-value').textContent = new Date().toLocaleDateString();
+    document.querySelector('.date-value').textContent = new Date().toLocaleDateString("fr-FR");
 
     setTimeout(() => window.dispatchEvent(new CustomEvent('table-displayed')));
     restoreSavedValues();
