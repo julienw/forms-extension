@@ -60,7 +60,7 @@
 
   function refreshWeeks() {
     state.weeks = monthWeekTable(state.currentYear, state.currentMonth)
-        .filter(week => week.some(day => ![null, 'WE'].includes(day.type)));
+      .filter(week => week.some(day => ![null, 'WE'].includes(day.type)));
   }
 
   function loadPTOData(holidays, refresh) {
@@ -75,64 +75,6 @@
 
   function zfill(val) {
     return ("0" + val).slice(-2);
-  }
-
-  function monthWeekTable(year, month_number) {
-
-    // month_number is in the range 1..12
-
-    var firstOfMonth = new Date(year, month_number-1, 1);
-    var lastOfMonth = new Date(year, month_number, 0);
-    var used = firstOfMonth.getDay() + 6 + lastOfMonth.getDate();
-    var numberOfWeeks = Math.ceil( used / 7);
-
-    var weeks = [];
-    for (var i = 0; i < numberOfWeeks; i++) {
-      weeks.push([{}, {}, {}, {}, {}, {}, {}]);
-    }
-
-    var firstWeekDayOfMonth = (firstOfMonth.getDay() - 1 + 7) % 7;
-    var numberOfDayInMonth = lastOfMonth.getDate();
-
-    var currentDayOfWeek = firstWeekDayOfMonth;
-    var currentWeekNumber = 0;
-
-    var frenchBankHolidays = getFrenchBankHolidays(year)
-    var bankHolidays = frenchBankHolidays
-        .map(holiday => year + "-" + zfill(holiday[0]) + "-" + zfill(holiday[1]));
-    var boxingDays = getBoxingDays(year, frenchBankHolidays)
-        .map(holiday => year + "-" + zfill(holiday[0]) + "-" + zfill(holiday[1]));
-
-    if (year < 2017) boxingDays = [];
-
-    weeks.forEach((week, weekIndex) => {
-      week.forEach((day, dayIndex) => {
-        var weekHasDays = false;
-        var globalIndex = weekIndex * 7 + dayIndex;
-        var dayOfMonth = globalIndex - firstWeekDayOfMonth + 1;
-
-        day.date = new Date(year, month_number-1, dayOfMonth);
-
-        if ([0, 6].includes(day.date.getDay())) {
-          day.hours = 8;
-          day.type = 'WE';
-        } else if (day.date.getMonth() === month_number - 1) {
-          var currentDate = year + "-" + zfill(day.date.getMonth() + 1) + "-" + zfill(dayOfMonth);
-          day.hours = 8;
-          if (bankHolidays.includes(currentDate)) {
-            day.type = 'JF';
-          } else if (boxingDays.includes(currentDate)) {
-            day.type = 'CS';
-          } else {
-            day.type = 'JT';
-          }
-        } else {
-          day.type = null;
-        }
-      });
-    });
-
-    return weeks;
   }
 
   function updateWeeksWithHolidays() {
@@ -151,7 +93,7 @@
           end.getMonth() >= state.currentMonth -1 && end.getFullYear() >= state.currentYear) {
         // Someday of this holiday are in the current month
         var hours = holiday.hours;
-        var type = Utils.guessTypeFromComment(holiday.comment) || 'CP';
+        var type = guessTypeFromComment(holiday.comment) || 'CP';
 
         state.weeks.forEach((week, weekIndex) => {
           week.forEach((day, dayIndex) => {
@@ -299,22 +241,6 @@
 
     setTimeout(() => window.dispatchEvent(new CustomEvent('table-displayed')));
     restoreSavedValues();
-  }
-
-  function displayWeeks() {
-    var form = document.querySelector('.choose-weeks-form');
-    var opts = { day: "numeric", month: 'long', year: "numeric" };
-    weeks.forEach((week, id) => {
-      /* Data is sanitized by the Template library. */
-      form.insertAdjacentHTML('beforeend', templates.week.interpolate({
-        id,
-        weekStart: week.start,
-        weekEnd: week.end,
-        weekStartText: week.start.toLocaleDateString(undefined, opts),
-        weekEndText: week.end.toLocaleDateString(undefined, opts),
-        futureClass: week.future ? 'week-future' : ''
-      }));
-    });
   }
 
   exports.changeMonthUp = changeMonthUp;
