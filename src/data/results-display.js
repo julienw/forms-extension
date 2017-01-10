@@ -231,11 +231,10 @@
     state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].type = type;
     state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].hours = nbHours;
 
-    if (!Object.keys(DEFAULT_SUMMARY_VALUES).includes(type)) {
-      state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].error = true;
-    } else {
-      state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].error = false;
-    }
+    state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].error = !Object
+      .keys(DEFAULT_SUMMARY_VALUES)
+      .includes(type);
+
     generatePTOForm();
   }
 
