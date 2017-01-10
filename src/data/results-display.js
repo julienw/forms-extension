@@ -10,14 +10,6 @@
   };
 
   var state = {};
-  var weeks;
-  var range = document.querySelector('.easy-selector-range');
-  var form = document.querySelector('.choose-weeks-form');
-  var sections = {
-    choose: document.querySelector('.choose-form'),
-    pto: document.querySelector('.pto-form')
-  };
-  var future = document.querySelector('.show-future-checkbox');
   var ptoTable = document.querySelector('.worked-days-table tbody');
   var ptoSummaryTable = document.querySelector('.summary');
 
@@ -84,7 +76,6 @@
   function zfill(val) {
     return ("0" + val).slice(-2);
   }
-
 
   function monthWeekTable(year, month_number) {
 
@@ -300,69 +291,9 @@
 
     setSummary(currentMonthDate, summary);
     document.querySelector('.date-value').textContent = new Date().toLocaleDateString();
-    sections.pto.hidden = false;
 
     setTimeout(() => window.dispatchEvent(new CustomEvent('table-displayed')));
     restoreSavedValues();
-  }
-
-  /**
-   * Inversely chronologically sort the weeks, and merge identical ones.
-   *
-   * We expect weeks to be properly structured already.
-   */
-  function sortAndMerge(weeks) {
-    weeks = weeks.sort((weekA, weekB) => weekB.start - weekA.start);
-
-    weeks = weeks.reduce((weeks, week) => {
-      if (!weeks.length) {
-        weeks.push(week);
-        return weeks;
-      }
-
-      var previous = weeks[weeks.length - 1];
-      if (+previous.start === +week.start) {
-        // same week => merge to the previous one
-        previous.holidayWeek = previous.holidayWeek.map(
-          (bool, i) => bool || week.holidayWeek[i]
-        );
-        return weeks;
-      }
-
-      weeks.push(week);
-      return weeks;
-    }, []);
-
-    return weeks;
-  }
-
-  function findFuture(weeks) {
-    weeks.forEach((week) => {
-      week.future = week.end > Date.now();
-    });
-  }
-
-  /**
-   * Returns an array of 5 elements, with booleans indicating whether each day of
-   * the week is part of the holiday.
-   *
-   * @returns {Array.<Integer>} < 0 if it's not an holiday, or the holiday index
-   */
-  function getHolidayWeek(week, holidayIdx) {
-    // convert back from json
-    ['start', 'end', 'holidayStart', 'holidayEnd'].forEach(prop => {
-      week[prop] = new Date(week[prop]);
-    });
-
-    var holidayWeek = new Array(5);
-    var firstDay = week.start.getUTCDate();
-    for (var i = 0; i < 5; i++) {
-      var curDate = new Date(+week.start);
-      curDate.setUTCDate(firstDay + i);
-      var isHoliday = week.holidayStart <= curDate && curDate <= week.holidayEnd;
-      holidayWeek[i] = isHoliday ? holidayIdx : -1;
-    }
-    return holidayWeek;
   }
 
   function displayWeeks() {
@@ -381,21 +312,8 @@
     });
   }
 
-  // taken from the gaia sms app
-  var rdashes = /-(.)/g;
-  function camelCase(str) {
-    return str.replace(rdashes, function replacer(str, p1) {
-      return p1.toUpperCase();
-    });
-  }
-
   exports.changeMonthUp = changeMonthUp;
   exports.changeMonthDown = changeMonthDown;
   exports.updateModel = updateModel;
-  exports.Debug = {
-    debugMyData() {
-      return { weeks, holidays };
-    }
-  };
 
 })(window);

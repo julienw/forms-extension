@@ -4,7 +4,6 @@
 
 var ptoForm = document.querySelector('.pto-form');
 
-restoreSavedValues();
 attachInputHandler();
 attachPersistHandler();
 
