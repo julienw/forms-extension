@@ -144,7 +144,7 @@
 
       // Handle case where holidays ends on a week-end
       while ([0, 6].includes(end.getDay())) {
-        date.setDate(date.getDate() - 1);
+        end.setDate(end.getDate() - 1);
       }
 
       if (start.getMonth() <= state.currentMonth - 1 && start.getFullYear() <= state.currentYear &&
