@@ -142,6 +142,11 @@
       var start = new Date(holiday.start);
       var end = new Date(holiday.end);
 
+      // Handle case where holidays ends on a week-end
+      while ([0, 6].includes(end.getDay())) {
+        date.setDate(date.getDate() - 1);
+      }
+
       if (start.getMonth() <= state.currentMonth - 1 && start.getFullYear() <= state.currentYear &&
           end.getMonth() >= state.currentMonth -1 && end.getFullYear() >= state.currentYear) {
         // Someday of this holiday are in the current month
