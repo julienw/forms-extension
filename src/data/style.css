@@ -74,6 +74,10 @@ td [contenteditable=true] {
 
 .has-content, [contenteditable=true]:focus, [data-persist] {
   border: 1px solid #ccc;
+											}
+
+.erroneous {
+	background: #FCC;
 }
 
 .unlink-button {

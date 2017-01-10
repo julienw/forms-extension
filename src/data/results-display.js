@@ -230,6 +230,12 @@
     type = /[A-Z]+/.exec(type.toUpperCase())[0];
     state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].type = type;
     state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].hours = nbHours;
+
+    if (!Object.keys(DEFAULT_SUMMARY_VALUES).includes(type)) {
+      state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].error = true;
+    } else {
+      state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].error = false;
+    }
     generatePTOForm();
   }
 
@@ -284,7 +290,8 @@
             className: 'has-content',
             type: (day.hours === 4 ? '0.5 ' : '') + day.type,
             weekId: week_id,
-            dayId: day_id
+            dayId: day_id,
+            classError: day.error ? 'erroneous' : ''
           };
           interpolateData.cells += templates.ptoCell.interpolate(cellData);
         }

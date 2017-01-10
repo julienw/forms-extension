@@ -124,7 +124,7 @@
 
     <div id='form-row-template' hidden><!--
       <tr class='absence-row'>
-        <th>Absence
+        <th>
           <div>Semaine du <span class='from'>${weekStart}</span> au <span class='to'>${weekEnd}</span></div>
           <div lang='en'>Week from <span class='from'>${weekStartUS}</span> to <span class='to'>${weekEndUS}</span></div>
         </th>
@@ -133,7 +133,7 @@
     --></div>
     <div id='form-cell-template' hidden><!--
       <td class='holiday-cell'>
-        <div contenteditable="true" class='${className}' data-week='${weekId}' data-day='${dayId}'>${type}</div>
+        <div contenteditable="true" class='${className} ${classError}' data-week='${weekId}' data-day='${dayId}'>${type}</div>
       </td>
     --></div>
   </body>
