@@ -155,7 +155,7 @@
           end.getMonth() >= state.currentMonth -1 && end.getFullYear() >= state.currentYear) {
         // Someday of this holiday are in the current month
         var hours = holiday.hours;
-        var type = guessTypeFromComment(holiday.comment) || 'CP';
+        var type = Utils.guessTypeFromComment(holiday.comment) || 'CP';
 
         state.weeks.forEach((week, weekIndex) => {
           week.forEach((day, dayIndex) => {
@@ -191,13 +191,6 @@
         });
       }
     });
-  }
-
-  function guessTypeFromComment(comment) {
-    var KNOWN_TYPES = ['RTT', 'CP', 'JF', 'CS', 'M'];
-    var type = KNOWN_TYPES.find(type => comment && comment.includes(type));
-    if (type == 'RTT') type = 'JRTT';
-    return type;
   }
 
   function changeMonthUp() {
