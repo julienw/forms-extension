@@ -224,7 +224,7 @@
 
   function updateModel(weekId, dayId, type) {
     var nbHours = 8;
-    if (type.startswith("0.5") || type.startswith("1/2") || type.startswith("0,5")) {
+    if (type.startsWith("0.5") || type.startsWith("1/2") || type.startsWith("0,5")) {
       nbHours = 4;
     }
     type = /[A-Z]+/.exec(type.toUpperCase())[0];
