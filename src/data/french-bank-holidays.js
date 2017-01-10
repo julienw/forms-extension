@@ -78,14 +78,7 @@ function getFrenchBankHolidays(year) {
 }
 
 function getBoxingDays(year, holidays) {
-  let boxing = [];
-
-  let nextNewYear = new Date(year + 1, 0, 1);
-  if (nextNewYear.getDay() === 6) {
-    boxing.push([12, 31, "New Years Day (observed)"]);
-  }
-
-  return holidays.map(holiday => {
+  let boxing = holidays.map(holiday => {
     let holidayDate = new Date(year, holiday[0] - 1, holiday[1]);
     // When the holiday is a Saturday, the previous Friday is a holiday
     if (holidayDate.getDay() == 6) {
@@ -97,7 +90,12 @@ function getBoxingDays(year, holidays) {
       let nextMonday = new Date(year, holiday[0] - 1, holiday[1] + 1);
       return [nextMonday.getMonth() + 1, nextMonday.getDate(), holiday[2] + " (observed)"];
     }
-  });
+  }).filter(defined => defined);
+  let nextNewYear = new Date(year + 1, 0, 1);
+  if (nextNewYear.getDay() === 6) {
+    boxing.push([12, 31, "New Years Day (observed)"]);
+  }
+  return boxing;
 }
 exports.getFrenchBankHolidays = getFrenchBankHolidays;
 exports.getBoxingDays = getBoxingDays;

@@ -81,7 +81,7 @@ describe("Utils", () => {
       var type = Utils.guessTypeFromComment("patho");
       expect(type).eql("M");
     });
-    
+
     it("should return CS for a comment containing maternité.", () => {
       var type = Utils.guessTypeFromComment("maternité");
       expect(type).eql("CS");

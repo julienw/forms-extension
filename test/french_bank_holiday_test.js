@@ -55,42 +55,42 @@ describe("French Bank Holidays", () => {
       ]);
     });
 
-    describe('#getBoxingDays', () => {
-      it("should turn Saturday holidays in Friday", () => {
-        // Turn January 10th 2015 in January 9th 2015.
-        var holidays = [[1, 10, 'A Saturday']];
-        var boxing = fbh.getBoxingDays(2015, holidays);
-        expect(boxing).eql([
-          [1, 9, 'A Saturday (observed)']
-        ]);
-      });
+  });
+  describe('#getBoxingDays', () => {
+    it("should turn Saturday holidays in Friday", () => {
+      // Turn January 10th 2015 in January 9th 2015.
+      var holidays = [[1, 10, 'A Saturday']];
+      var boxing = fbh.getBoxingDays(2015, holidays);
+      expect(boxing).eql([
+        [1, 9, 'A Saturday (observed)']
+      ]);
+    });
 
-      it("should turn Sunday holidays in Monday", () => {
-        // Turn January 11th 2015 in January 12th 2015.
-        var holidays = [[1, 11, 'A Sunday']];
-        var boxing = fbh.getBoxingDays(2015, holidays);
-        expect(boxing).eql([
-          [1, 12, 'A Sunday (observed)']
-        ]);
-      });
+    it("should turn Sunday holidays in Monday", () => {
+      // Turn January 11th 2015 in January 12th 2015.
+      var holidays = [[1, 11, 'A Sunday']];
+      var boxing = fbh.getBoxingDays(2015, holidays);
+      expect(boxing).eql([
+        [1, 12, 'A Sunday (observed)']
+      ]);
+    });
 
-      it("should turn January 1st in a Saturday as a Friday of the previous year.", () => {
-        // Turn January 1th 2011 in December 31st 2010.
-        var holidays = [];
-        var boxing = fbh.getBoxingDays(2010, holidays);
-        expect(boxing).eql([
-          [12, 31, 'New Years Day (observed)']
-        ]);
-      });
+    it("should turn January 1st in a Saturday as a Friday of the previous year.", () => {
+      // Turn January 1th 2011 in December 31st 2010.
+      var holidays = [];
+      var boxing = fbh.getBoxingDays(2010, holidays);
+      expect(boxing).eql([
+        [12, 31, 'New Years Day (observed)']
+      ]);
+    });
 
-      it("should return all boxing days of 2017.", () => {
-        var holidays = fbh.getFrenchBankHolidays(2017);
-        var boxing = fbh.getBoxingDays(2017, holidays);
-        expect(boxing).eql([
-          [1, 2, 'New Years Day (observed)'],
-          [11, 10, 'Armistice Day (observed)'],
-        ]);
-      });
+    it("should return all boxing days of 2017.", () => {
+      var holidays = fbh.getFrenchBankHolidays(2017);
+      var boxing = fbh.getBoxingDays(2017, holidays);
+      expect(boxing).eql([
+        [1, 2, 'New Years Day (observed)'],
+        [11, 10, 'Armistice Day (observed)'],
+      ]);
     });
   });
 });
