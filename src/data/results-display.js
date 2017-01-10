@@ -221,12 +221,11 @@
       nbHours = 4;
     }
     type = /[A-Z]+/.exec(type.toUpperCase())[0];
-    state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].type = type;
-    state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].hours = nbHours;
 
-    state.weeks[parseInt(weekId, 10)][parseInt(dayId, 10)].error = !Object
-      .keys(DEFAULT_SUMMARY_VALUES)
-      .includes(type);
+    const day = state.weeks[weekId][dayId];
+    day.type = type;
+    day.hours = nbHours;
+    day.error = !Object.keys(DEFAULT_SUMMARY_VALUES).includes(type);
 
     generatePTOForm();
   }

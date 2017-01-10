@@ -168,10 +168,10 @@ function onThrottledInput(callback, e) {
 
 function mirrorHolidayValue(cell, callback) {
   var input = cell.querySelector('[contenteditable="true"]')
-  var weekId = input.dataset.week;
-  var dayId = input.dataset.day;
+  var weekId = parseInt(input.dataset.week, 10);
+  var dayId = parseInt(input.dataset.day, 10);
   var value = input.textContent.trim();
-  callback(weekId, dayId, value.trim());
+  callback(weekId, dayId, value);
 }
 
 })();

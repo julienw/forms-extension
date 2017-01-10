@@ -4,27 +4,27 @@
 'use strict';
 
 function _easter (year, julian, gregorian) {
-    var k = Math.floor(year / 100)
-    var m = 15 + Math.floor((3 * k + 3) / 4) - Math.floor((8 * k + 13) / 25)
-    var s = 2 - Math.floor((3 * k + 3) / 4)
+    let k = Math.floor(year / 100)
+    let m = 15 + Math.floor((3 * k + 3) / 4) - Math.floor((8 * k + 13) / 25)
+    let s = 2 - Math.floor((3 * k + 3) / 4)
     if (julian) {
       m = 15
       s = 0
     }
-    var a = year % 19
-    var d = (19 * a + m) % 30
-    var r = Math.floor((d + a / 11) / 29)
-    var og = 21 + d - r
-    var sz = 7 - Math.floor(year + year / 4 + s) % 7
-    var oe = 7 - (og - sz) % 7
-    var os = og + oe
+    let a = year % 19
+    let d = (19 * a + m) % 30
+    let r = Math.floor((d + a / 11) / 29)
+    let og = 21 + d - r
+    let sz = 7 - Math.floor(year + year / 4 + s) % 7
+    let oe = 7 - (og - sz) % 7
+    let os = og + oe
     if (gregorian) {
       os = os + Math.floor(year / 100) - Math.floor(year / 400) - 2
     }
     //                      1   2   3   4   5   6   7   8
-    var daysPerMonth = [0, 31, 28, 31, 30, 31, 30, 31, 31]
-    var day = os
-    var month
+    let daysPerMonth = [0, 31, 28, 31, 30, 31, 30, 31, 31]
+    let day = os
+    let month
     for (month = 3; month < 8; month++) {
       if (day <= daysPerMonth[month]) {
         break
@@ -33,6 +33,16 @@ function _easter (year, julian, gregorian) {
     }
 
     return new Date(year, month - 1, day)
+}
+
+function sortHolidays(previousDay, currentDay) {
+  // Compare months
+  if (previousDay[0] < currentDay[0]) return -1;
+  if (previousDay[0] > currentDay[0]) return 1;
+  // Compare days
+  if (previousDay[1] < currentDay[1]) return -1;
+  if (previousDay[1] > currentDay[1]) return 1;
+  return 0;
 }
 
 function getFrenchBankHolidays(year) {
@@ -50,53 +60,44 @@ function getFrenchBankHolidays(year) {
   let holidays = FIXED_HOLIDAYS.slice(0);
 
   // Include easter Monday
-  var easter = _easter(year);
-  var easterMonday = new Date(easter.getYear(), easter.getMonth(), easter.getDate() + 1);
+  let easter = _easter(year);
+  let easterMonday = new Date(easter.getYear(), easter.getMonth(), easter.getDate() + 1);
 
   holidays.push([easterMonday.getMonth() + 1, easterMonday.getDate(), "Easter monday"]);
 
   // Include ascension
-  var ascensionThursday = new Date(easter.getYear(), easter.getMonth(), easter.getDate() + 39);
+  let ascensionThursday = new Date(easter.getYear(), easter.getMonth(), easter.getDate() + 39);
   holidays.push([ascensionThursday.getMonth() + 1, ascensionThursday.getDate(), "Ascension Thursday"]);
 
   // Include whitMonday
   // At Mozilla France we do work during Whit Monday.
-  // var whitMonday = new Date(easter.getYear(), easter.getMonth(), easter.getDate() + 50);
+  // let whitMonday = new Date(easter.getYear(), easter.getMonth(), easter.getDate() + 50);
   // holidays.push([whitMonday.getMonth() + 1, whitMonday.getDate(), "Whit Monday"]);
 
-  return holidays.slice(0).sort((previousDay, currentDay) => {
-    // Compare months
-    if (previousDay[0] < currentDay[0]) return -1;
-    if (previousDay[0] > currentDay[0]) return 1;
-    // Compare days
-    if (previousDay[1] < currentDay[1]) return -1;
-    if (previousDay[1] > currentDay[1]) return 1;
-    return 0;
-  });
+  return holidays.slice(0).sort(sortHolidays);
 }
 
 function getBoxingDays(year, holidays) {
-  var boxing = [];
+  let boxing = [];
 
-  var nextNewYear = new Date(year + 1, 0, 1);
+  let nextNewYear = new Date(year + 1, 0, 1);
   if (nextNewYear.getDay() === 6) {
     boxing.push([12, 31, "New Years Day (observed)"]);
   }
 
-  holidays.forEach(holiday => {
-    var holidayDate = new Date(year, holiday[0] - 1, holiday[1]);
+  return holidays.map(holiday => {
+    let holidayDate = new Date(year, holiday[0] - 1, holiday[1]);
     // When the holiday is a Saturday, the previous Friday is a holiday
     if (holidayDate.getDay() == 6) {
-      var previousFriday = new Date(year, holiday[0] - 1, holiday[1] - 1);
-      boxing.push([previousFriday.getMonth() + 1, previousFriday.getDate(), holiday[2] + " (observed)"]);
+      let previousFriday = new Date(year, holiday[0] - 1, holiday[1] - 1);
+      return [previousFriday.getMonth() + 1, previousFriday.getDate(), holiday[2] + " (observed)"];
     }
     // When the holiday is a Sunday, the next Monday is a holiday
     if (holidayDate.getDay() == 0) {
-      var nextMonday = new Date(year, holiday[0] - 1, holiday[1] + 1);
-      boxing.push([nextMonday.getMonth() + 1, nextMonday.getDate(), holiday[2] + " (observed)"]);
+      let nextMonday = new Date(year, holiday[0] - 1, holiday[1] + 1);
+      return [nextMonday.getMonth() + 1, nextMonday.getDate(), holiday[2] + " (observed)"];
     }
   });
-  return boxing;
 }
 exports.getFrenchBankHolidays = getFrenchBankHolidays;
 exports.getBoxingDays = getBoxingDays;
