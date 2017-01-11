@@ -3,7 +3,6 @@
 var XMLHttpRequest = require('sdk/net/xhr').XMLHttpRequest;
 var ActionButton = require('sdk/ui/button/action').ActionButton;
 var tabs = require('sdk/tabs');
-var data = require('sdk/self').data;
 
 var ptoWebsiteUrl = 'https://pto.mozilla.org/mypto.php';
 
@@ -17,25 +16,6 @@ function init() {
 }
 
 function generate() {
-  var periodStart;
-
-  var what = 'lastmonth';
-  switch (what) {
-    case 'lastmonth':
-      var currentDate = new Date();
-      periodStart = new Date(Date.UTC(
-        currentDate.getUTCFullYear(),
-        currentDate.getUTCMonth() - 1,
-        1
-      ));
-  }
-
-  var periodEnd = new Date(Date.UTC(
-    periodStart.getUTCFullYear(),
-    periodStart.getUTCMonth() + 1,
-    0
-  ));
-
   getAllHolidays(ptoWebsiteUrl).then(showResults);
 }
 

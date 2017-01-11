@@ -1,7 +1,7 @@
 /*jshint esnext: true */
 (function(exports) {
 
-var Utils = exports.Utils = {
+exports.Utils = {
   throttle(func, delay) {
     var timeout;
 

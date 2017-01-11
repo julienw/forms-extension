@@ -1,4 +1,5 @@
 /*jshint esnext: true */
+/* global cloneInto */
 
 self.port.on(
   'show', (holidays) => {

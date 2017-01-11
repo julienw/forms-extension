@@ -1,4 +1,5 @@
 /*jshint esnext: true */
+/* global Template, fakeData, restoreSavedValues, monthWeekTable, guessTypeFromComment */
 
 (function(exports) {
   'use strict';
@@ -9,7 +10,6 @@
     ptoSummary: new Template('form-summary-template')
   };
 
-  var state = {};
   var ptoTable = document.querySelector('.worked-days-table tbody');
   var ptoSummaryTable = document.querySelector('.summary');
 
@@ -95,8 +95,8 @@
         var hours = holiday.hours;
         var type = guessTypeFromComment(holiday.comment) || 'CP';
 
-        state.weeks.forEach((week, weekIndex) => {
-          week.forEach((day, dayIndex) => {
+        state.weeks.forEach(week => {
+          week.forEach(day => {
             var currentDayText = day.date.getFullYear() + '-' + zfill(day.date.getMonth() - 1) + '-' + zfill(day.date.getDate());
             var startDayText = start.getFullYear() + '-' + zfill(start.getMonth() - 1) + '-' + zfill(start.getDate());
             var endDayText = end.getFullYear() + '-' + zfill(end.getMonth() - 1) + '-' + zfill(end.getDate());

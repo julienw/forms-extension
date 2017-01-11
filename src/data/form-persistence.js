@@ -1,4 +1,6 @@
 /*jshint esnext: true */
+/* global asyncStorage, Utils */
+
 (function(exports) {
 'use strict';
 
@@ -13,7 +15,7 @@ function attachInputHandler() {
 
 function attachPersistHandler() {
   window.addEventListener('persist-value', (e) => {
-    var { persistKey, blob, width, height } = e.detail;
+    var { persistKey, blob } = e.detail;
     persist(persistKey, blob);
     displaySavedValue(persistKey, blob);
   });

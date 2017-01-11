@@ -1,3 +1,4 @@
+/* global getBoxingDays, getFrenchBankHolidays */
 (function(exports) {
   "use strict";
 

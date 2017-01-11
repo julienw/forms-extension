@@ -1,4 +1,6 @@
 /*jshint esnext:true */
+/* global Utils, updateModel */
+
 (function() {
 
 'use strict';
