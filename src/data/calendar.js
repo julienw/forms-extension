@@ -2,9 +2,7 @@
 (function(exports) {
   "use strict";
 
-  var WORKING_DAY_TYPES = ['JT', 'CP', 'JRTT', 'M'];
-
-
+  var WORKING_DAY_TYPES = ['JT', 'CP', 'JRTT', 'M', 'CS'];
 
   function toTitleCase(str) {
     return str.replace(/\w\S*/g, function(txt) {

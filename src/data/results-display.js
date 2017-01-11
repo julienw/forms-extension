@@ -34,13 +34,13 @@
 
   function initCommunication() {
     // Get back the PTO holidays from the PTO tool.
-    window.addEventListener('show-holidays', (e) => loadPTOData(e.detail, true));
+    window.addEventListener('show-holidays', (e) => loadPTOData(e.detail));
   }
 
   function initFakeData() {
     if (window.location.protocol !== 'resource:') {
       // We're not in the addon
-      loadPTOData(fakeData, true);
+      loadPTOData(fakeData);
     }
   }
 
@@ -61,13 +61,11 @@
       .filter(week => week.some(day => ![null, 'WE'].includes(day.type)));
   }
 
-  function loadPTOData(holidays, refresh) {
+  function loadPTOData(holidays) {
     state.holidays = holidays;
     if (state.hasOwnProperty("weeks")) {
       state.weeks = updateWeeksWithHolidays(state);
-      if (refresh === true) {
-        generatePTOForm();
-      }
+      generatePTOForm();
     }
   }
 
@@ -137,6 +135,10 @@
 
       week.forEach((day, day_id) => {
         var cellData;
+        if ([0, 6].includes(day.date.getDay())) {
+          return;
+        }
+
         if (!day.type) {
           cellData = {
             id: 'day-' + week_id + '_' + day_id,
@@ -146,7 +148,7 @@
             dayId: day_id
           };
           interpolateData.cells += templates.ptoCell.interpolate(cellData);
-        } else  if (![0, 6].includes(day.date.getDay())) {
+        } else {
           // Increment counters
           summary[day.type] += day.hours / 8;
           summary.JT += 1 - (day.hours / 8);
