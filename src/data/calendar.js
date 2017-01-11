@@ -2,20 +2,13 @@
 (function(exports) {
   "use strict";
 
-  function toTitleCase(str) {
-    return str.replace(/\w\S*/g, function(txt) {
-      // Make sure the first letter of each word is Upper Case.
-      return txt.charAt(0).toUpperCase() + txt.substr(1);
-    });
-  }
-
   function guessTypeFromComment(comment) {
-    var KNOWN_TYPES = ['RTT', 'CP', 'CS', 'M'];
-    var words = {'sick': 'M', 'maladie': 'M', 'patho': 'M',
+    var KNOWN_TYPES = ['RTT', 'CP', 'CS'];
+    var words = {'sick': 'M', 'malad': 'M', 'patho': 'M',
                  'wedding': 'CS', 'mariage': 'CS',
                  'maternité': 'CS', 'parental': 'CS', 'paternité': 'CS',
                  'sans solde': 'CS'};
-    var type = KNOWN_TYPES.find(type => comment && toTitleCase(comment).includes(type));
+    var type = KNOWN_TYPES.find(type => comment && comment.includes(type));
     if (type == 'RTT') type = 'JRTT';
     Object.keys(words).some(word => {
       if (comment && comment.toLowerCase().includes(word)) {

@@ -87,9 +87,9 @@ describe("Calendar", () => {
       expect(type).eql("CS");
     });
 
-    it("should return M for a comment containing M.", () => {
-      var type = Calendar.guessTypeFromComment("M");
-      expect(type).eql("M");
+    it("should not return M when a comment contains the letter M", () => {
+      var type = Calendar.guessTypeFromComment("My dog ran away");
+      expect(type).eql("CP");
     });
 
     it("should return M for a comment containing Maladie.", () => {
@@ -99,6 +99,11 @@ describe("Calendar", () => {
 
     it("should return M for a comment containing maladie.", () => {
       var type = Calendar.guessTypeFromComment("maladie");
+      expect(type).eql("M");
+    });
+
+    it("should return M for a comment containing malade.", () => {
+      var type = Calendar.guessTypeFromComment("je suis malade");
       expect(type).eql("M");
     });
 
