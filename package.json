@@ -4,8 +4,8 @@
   "description": "Used by french employees to generate their holiday form",
   "main": "index.js",
   "scripts": {
-    "lint": "./node_modules/.bin/eslint src lib",
-    "test": "./node_modules/.bin/mocha"
+    "lint": "eslint src lib",
+    "test": "mocha"
   },
   "repository": {
     "type": "git",

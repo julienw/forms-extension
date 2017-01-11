@@ -3,6 +3,7 @@
 (function(exports) {
 'use strict';
 
+// Taken from https://github.com/commenthol/date-easter/blob/bbdd1a3/index.js#L53-L89
 function _easter (year, julian, gregorian) {
     let k = Math.floor(year / 100)
     let m = 15 + Math.floor((3 * k + 3) / 4) - Math.floor((8 * k + 13) / 25)
