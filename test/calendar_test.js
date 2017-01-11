@@ -137,6 +137,147 @@ describe("Calendar", () => {
       expect(type).eql("M");
     });
 
-
   });
+
+  describe("#updateWeeksWithHolidays()", () => {
+    let state;
+
+    beforeEach(() => {
+      state = {
+        weeks: Calendar.monthWeekTable(2017, 1),
+        holidays: [{
+          start: new Date(2017, 0, 2),
+          end: new Date(2017, 0, 8),
+          comment: 'RTT',
+          hours: 32
+        }],
+        currentMonth: 1,
+        currentYear: 2017
+      };
+    });
+
+    it("should set the first week of January as a week of RTT", () => {
+      var weeks = Calendar.updateWeeksWithHolidays(state);
+      // The first week of January only contains Sunday 1st.
+      expect(weeks[1])
+        .eql([
+          {'date': new Date(2017, 0, 2),
+           'hours': 8,
+           'type': 'CS'
+          },
+          {'date': new Date(2017, 0, 3),
+           'hours': 8,
+           'type': 'JRTT'
+          },
+          {'date': new Date(2017, 0, 4),
+           'hours': 8,
+           'type': 'JRTT'
+          },
+          {'date': new Date(2017, 0, 5),
+           'hours': 4,
+           'type': 'JRTT'
+          },
+          {'date': new Date(2017, 0, 6),
+           'hours': 4,
+           'type': 'JRTT'
+          },
+          {'date': new Date(2017, 0, 7),
+           'hours': 8,
+           'type': 'WE'
+          },
+          {'date': new Date(2017, 0, 8),
+           'hours': 8,
+           'type': 'WE'
+          }
+        ]);
+    });
+
+    it("should handle last day as half day.", () => {
+      state.holidays = [{
+        start: new Date(2017, 0, 2),
+        end: new Date(2017, 0, 8),
+        comment: 'RTT',
+        hours: 36
+      }];
+
+      var weeks = Calendar.updateWeeksWithHolidays(state);
+      // The first week of January only contains Sunday 1st.
+      expect(weeks[1])
+        .eql([
+          {'date': new Date(2017, 0, 2),
+           'hours': 8,
+           'type': 'CS'
+          },
+          {'date': new Date(2017, 0, 3),
+           'hours': 8,
+           'type': 'JRTT'
+          },
+          {'date': new Date(2017, 0, 4),
+           'hours': 8,
+           'type': 'JRTT'
+          },
+          {'date': new Date(2017, 0, 5),
+           'hours': 8,
+           'type': 'JRTT'
+          },
+          {'date': new Date(2017, 0, 6),
+           'hours': 4,
+           'type': 'JRTT'
+          },
+          {'date': new Date(2017, 0, 7),
+           'hours': 8,
+           'type': 'WE'
+          },
+          {'date': new Date(2017, 0, 8),
+           'hours': 8,
+           'type': 'WE'
+          }
+        ]);
+    });
+
+    it("should handle two last days as half day.", () => {
+      state.holidays = [{
+        start: new Date(2017, 0, 2),
+        end: new Date(2017, 0, 8),
+        comment: 'RTT',
+        hours: 32
+      }];
+
+      var weeks = Calendar.updateWeeksWithHolidays(state);
+      // The first week of January only contains Sunday 1st.
+      expect(weeks[1])
+        .eql([
+          {'date': new Date(2017, 0, 2),
+           'hours': 8,
+           'type': 'CS'
+          },
+          {'date': new Date(2017, 0, 3),
+           'hours': 8,
+           'type': 'JRTT'
+          },
+          {'date': new Date(2017, 0, 4),
+           'hours': 8,
+           'type': 'JRTT'
+          },
+          {'date': new Date(2017, 0, 5),
+           'hours': 4,
+           'type': 'JRTT'
+          },
+          {'date': new Date(2017, 0, 6),
+           'hours': 4,
+           'type': 'JRTT'
+          },
+          {'date': new Date(2017, 0, 7),
+           'hours': 8,
+           'type': 'WE'
+          },
+          {'date': new Date(2017, 0, 8),
+           'hours': 8,
+           'type': 'WE'
+          }
+        ]);
+    });
+});
+
+
 });
