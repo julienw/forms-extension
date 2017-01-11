@@ -2,8 +2,6 @@
 (function(exports) {
   "use strict";
 
-  var WORKING_DAY_TYPES = ['JT', 'CP', 'JRTT', 'M', 'CS'];
-
   function toTitleCase(str) {
     return str.replace(/\w\S*/g, function(txt) {
       // Make sure the first letter of each word is Upper Case.
@@ -110,7 +108,7 @@
             if (startDayText <= currentDayText && endDayText >= currentDayText) {
               var isLast = endDayText == currentDayText;
               if (day.type !== 'WE') {
-                if (WORKING_DAY_TYPES.includes(day.type)) {
+                if (day.type == 'JT') {
                   day.type = type;
                   // If there is still more than 8 hours, it is probably a full day off
                   if (hours > 8) {
@@ -141,6 +139,5 @@
   exports.guessTypeFromComment = guessTypeFromComment;
   exports.monthWeekTable = monthWeekTable;
   exports.updateWeeksWithHolidays = updateWeeksWithHolidays;
-  exports.WORKING_DAY_TYPES = WORKING_DAY_TYPES;
 
 })(typeof window === "object" ? window : exports);

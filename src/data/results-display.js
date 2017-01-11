@@ -1,5 +1,5 @@
 /*jshint esnext: true */
-/* global Template, fakeData, restoreSavedValues, monthWeekTable, guessTypeFromComment */
+/* global Template, fakeData, restoreSavedValues, monthWeekTable, updateWeeksWithHolidays */
 
 (function(exports) {
   'use strict';
@@ -9,6 +9,8 @@
     ptoCell: new Template('form-cell-template'),
     ptoSummary: new Template('form-summary-template')
   };
+
+  var WORKING_DAY_TYPES = ['JT', 'CP', 'JRTT', 'M', 'CS'];
 
   var ptoTable = document.querySelector('.worked-days-table tbody');
   var ptoSummaryTable = document.querySelector('.summary');
