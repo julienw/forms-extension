@@ -49,8 +49,8 @@
   function getDefaultState() {
     var state = {};
     var today = new Date();
-    state.currentMonth = today.getMonth();
-    state.currentYear = today.getFullYear();
+    state.currentMonth = today.getUTCMonth();
+    state.currentYear = today.getUTCFullYear();
     if (state.currentMonth === 0) {
       state.currentMonth = 12;
       --state.currentYear;
@@ -137,7 +137,7 @@
 
       week.forEach((day, day_id) => {
         var cellData;
-        if ([0, 6].includes(day.date.getDay())) {
+        if ([0, 6].includes(day.date.getUTCDay())) {
           return;
         }
 

@@ -32,14 +32,14 @@
     // month is in the range 1..12
     var firstOfMonth = utcDate(year, month, 1);
     var lastOfMonth = utcDate(year, month + 1, 0);
-    var used = firstOfMonth.getDay() + 6 + lastOfMonth.getDate();
+    var used = firstOfMonth.getUTCDay() + 6 + lastOfMonth.getDate();
     var numberOfWeeks = Math.ceil(used / 7);
 
     var weeks = [];
     for (var i = 0; i < numberOfWeeks; i++) {
       weeks.push([{}, {}, {}, {}, {}, {}, {}]);
     }
-    var firstWeekDayOfMonth = (firstOfMonth.getDay() - 1 + 7) % 7;
+    var firstWeekDayOfMonth = (firstOfMonth.getUTCDay() - 1 + 7) % 7;
 
     var frenchBankHolidays = getFrenchBankHolidays(year)
     var bankHolidays = frenchBankHolidays
@@ -55,10 +55,10 @@
         var dayOfMonth = globalIndex - firstWeekDayOfMonth + 1;
         day.date = utcDate(year, month, dayOfMonth);
 
-        if (day.date.getMonth() === month - 1) {
+        if (day.date.getUTCMonth() === month - 1) {
           var currentDate = formatDateString(day.date);
           day.hours = 8;
-          if ([0, 6].includes(day.date.getDay())) {
+          if ([0, 6].includes(day.date.getUTCDay())) {
             day.hours = 8;
             day.type = 'WE';
           } else if (bankHolidays.includes(currentDate)) {
@@ -76,6 +76,13 @@
     });
   }
 
+  function isInCurrentMonth(startDate, endDate, month, year) {
+    return startDate.getUTCMonth() <= month - 1 &&
+           startDate.getFullYear() <= year &&
+           endDate.getUTCMonth() >= month - 1 &&
+           endDate.getFullYear() >= year;
+  }
+
   function updateWeeksWithHolidays(state) {
     // Update the weeks data with the PTO infos for the current month.
     state.holidays.forEach(({start, end, hours, comment}) => {
@@ -83,13 +90,12 @@
       const endDate = new Date(end);
 
       // Handle case where holidays ends on a week-end
-      while ([0, 6].includes(endDate.getDay())) {
+      while ([0, 6].includes(endDate.getUTCDay())) {
         endDate.setDate(endDate.getDate() - 1);
       }
 
       // Is in current month?
-      if (startDate.getMonth() <= state.currentMonth - 1 && startDate.getFullYear() <= state.currentYear &&
-          endDate.getMonth() >= state.currentMonth - 1 && endDate.getFullYear() >= state.currentYear) {
+      if (isInCurrentMonth(startDate, endDate, state.currentMonth, state.currentYear)) {
         // Someday of this holiday are in the current month
         var type = guessTypeFromComment(comment);
 

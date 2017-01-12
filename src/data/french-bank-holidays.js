@@ -55,11 +55,11 @@ function addDays(date, days) {
 }
 
 function isSaturday(date) {
-  return date.getDay() === 6;
+  return date.getUTCDay() === 6;
 }
 
 function isSunday(date) {
-  return date.getDay() === 0;
+  return date.getUTCDay() === 0;
 }
 
 function getFrenchBankHolidays(year) {

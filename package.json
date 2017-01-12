@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint src lib",
-    "start": "cd src && jpm run -b /usr/bin/firefox && cd ..",
+    "start": "cd src && jpm run",
     "test": "mocha"
   },
   "repository": {
