@@ -10,7 +10,7 @@ attachInputHandler();
 attachEmptyCellHandler();
 
 function attachInputHandler() {
-  table.addEventListener('input', Utils.throttle(onThrottledInput.bind(null, updateModel), 2000));
+  table.addEventListener('input', Utils.throttle((e) => onThrottledInput(e, updateModel), 2000));
 }
 
 function attachEmptyCellHandler() {
@@ -29,7 +29,7 @@ function attachEmptyCellHandler() {
   });
 }
 
-function onThrottledInput(callback, e) {
+function onThrottledInput(e, callback) {
   if (e.target.isContentEditable) {
     mirrorHolidayValue(e.target.closest('td'), callback);
   }
