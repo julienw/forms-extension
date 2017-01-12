@@ -1,5 +1,5 @@
 /*jshint esnext: true */
-/* global Template, fakeData, restoreSavedValues, monthWeekTable, updateWeeksWithHolidays */
+/* global utcDate, Template, fakeData, restoreSavedValues, monthWeekTable, updateWeeksWithHolidays */
 
 (function(exports) {
   'use strict';
@@ -119,7 +119,7 @@
   function generatePTOForm() {
     ptoTable.innerHTML = '';
 
-    var currentMonthDate = new Date(state.currentYear, state.currentMonth - 1, 1);
+    var currentMonthDate = utcDate(state.currentYear, state.currentMonth, 1);
     var summary = Object.assign({}, DEFAULT_SUMMARY_VALUES);
 
     state.weeks.forEach((week, week_id) => {

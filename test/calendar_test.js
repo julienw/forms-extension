@@ -152,8 +152,8 @@ describe("Calendar", () => {
       state = {
         weeks: Calendar.monthWeekTable(2017, 1),
         holidays: [{
-          start: utcDate(2017, 1, 2),
-          end: utcDate(2017, 1, 8),
+          start: "2017-01-02T00:00:00.000Z",
+          end: "2017-01-08T00:00:00.000Z",
           comment: 'RTT',
           hours: 32
         }],
@@ -200,8 +200,8 @@ describe("Calendar", () => {
 
     it("should handle last day as half day.", () => {
       state.holidays = [{
-        start: utcDate(2017, 1, 2),
-        end: utcDate(2017, 1, 8),
+        start: "2017-01-02T00:00:00.000Z",
+        end: "2017-01-08T00:00:00.000Z",
         comment: 'RTT',
         hours: 36
       }];
@@ -243,8 +243,8 @@ describe("Calendar", () => {
 
     it("should handle two last days as half day.", () => {
       state.holidays = [{
-        start: utcDate(2017, 1, 2),
-        end: utcDate(2017, 1, 8),
+        start: "2017-01-02T00:00:00.000Z",
+        end: "2017-01-08T00:00:00.000Z",
         comment: 'RTT',
         hours: 32
       }];

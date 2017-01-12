@@ -79,21 +79,24 @@
   function updateWeeksWithHolidays(state) {
     // Update the weeks data with the PTO infos for the current month.
     state.holidays.forEach(({start, end, hours, comment}) => {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+
       // Handle case where holidays ends on a week-end
-      while ([0, 6].includes(end.getDay())) {
-        end.setDate(end.getDate() - 1);
+      while ([0, 6].includes(endDate.getDay())) {
+        endDate.setDate(endDate.getDate() - 1);
       }
 
       // Is in current month?
-      if (start.getMonth() <= state.currentMonth - 1 && start.getFullYear() <= state.currentYear &&
-          end.getMonth() >= state.currentMonth - 1 && end.getFullYear() >= state.currentYear) {
+      if (startDate.getMonth() <= state.currentMonth - 1 && startDate.getFullYear() <= state.currentYear &&
+          endDate.getMonth() >= state.currentMonth - 1 && endDate.getFullYear() >= state.currentYear) {
         // Someday of this holiday are in the current month
         var type = guessTypeFromComment(comment);
 
         state.weeks.forEach(week => {
           week.forEach(day => {
-            if (start <= day.date && end >= day.date) {
-              var isLast = end.toJSON() === day.date.toJSON();
+            if (startDate <= day.date && endDate >= day.date) {
+              var isLast = endDate.toJSON() === day.date.toJSON();
               if (day.type !== 'WE') {
                 if (day.type == 'JT') {
                   day.type = type;
