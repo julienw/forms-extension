@@ -5,7 +5,7 @@
   "description": "Used by french employees to generate their holiday form",
   "author": "Julien Wajsberg",
   "license": "MIT",
-  "version": "1.1.0",
+  "version": "1.1.0-pre.0",
   "homepage": "https://github.com/julienw/forms-extension",
   "main": "lib/main.js"
 }
