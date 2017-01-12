@@ -1,10 +1,11 @@
 /*jshint esnext: true */
-(function() {
+/* global asyncStorage, Utils */
+
+(function(exports) {
 'use strict';
 
 var ptoForm = document.querySelector('.pto-form');
 
-restoreSavedValues();
 attachInputHandler();
 attachPersistHandler();
 
@@ -14,7 +15,7 @@ function attachInputHandler() {
 
 function attachPersistHandler() {
   window.addEventListener('persist-value', (e) => {
-    var { persistKey, blob, width, height } = e.detail;
+    var { persistKey, blob } = e.detail;
     persist(persistKey, blob);
     displaySavedValue(persistKey, blob);
   });
@@ -75,4 +76,5 @@ function displaySavedValue(persistKey, value, excluded) {
   });
 }
 
-})();
+exports.restoreSavedValues = restoreSavedValues;
+})(window);

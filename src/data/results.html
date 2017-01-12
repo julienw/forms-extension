@@ -3,34 +3,29 @@
   <head>
     <meta charset='utf-8'>
     <link rel='stylesheet' href='style.css'>
+    <link rel='stylesheet' href='print.css' media='print'>
     <script defer src='template.js'></script>
     <script defer src='utils.js'></script>
     <script defer src='async_storage.js'></script>
     <script defer src='fake-data.js'></script>
-    <script defer src='results-display.js'></script>
+    <script defer src='french-bank-holidays.js'></script>
+    <script defer src='calendar.js'></script>
     <script defer src='form-persistence.js'></script>
+    <script defer src='results-display.js'></script>
     <script defer src='form-interaction.js'></script>
     <script defer src='signature-editor.js'></script>
   </head>
   <body>
-    <section class='choose-form'>
-      <form class='choose-weeks-form hide-future'>
-        <div class='controls'>
-          <button>Generate form</button>
-          <input type='range' class='easy-selector-range' value='0'></input>
-          <label><input type='checkbox' class='show-future-checkbox'> Show future</label>
-        </div>
-      </form>
-    </section>
 
+    <button id='monthDown' onClick="changeMonthDown();">Previous</button>
+    <button id='monthUp' onClick="changeMonthUp();">Next</button>
     <!-- PTO FORM -->
-    <section class='pto-form' hidden>
-      <h1>Décompte des heures de travail plafonné en jours sur l'année</h1>
-      <h2 lang='en'>Monitoring form of working hours capped in days over the year</h2>
-      <div class='worker-information'>
-        <div class='who'>Nom (<em lang='en'>name</em>): <span class='last-name' contenteditable='true' data-persist='last-name'>Lastname</span></div>
-        <div>Poste (<em lang='en'>position</em>): <span class='position' contenteditable='true' data-persist='position'>Engineer</span></div>
-      </div>
+    <section class='pto-form'>
+      <h1>Feuille auto-déclarative des salariés en forfait-jours</h1>
+      <h2 lang='en'>Auto-declarative form for autonomous executives — 218 days of work per year scheme</h2>
+      <table class='summary'>
+          <!-- Content will be inserted by form-summary-template -->
+      </table>
 
       <table class='worked-days-table'>
         <thead>
@@ -41,45 +36,19 @@
             <th>Mercredi <em lang='en'>(Wednesday)</em></th>
             <th>Jeudi <em lang='en'>(Thursday)</em></th>
             <th>Vendredi <em lang='en'>(Friday)</em></th>
-            <th>Total</th>
           </tr>
         </thead>
+        <tbody>
+        </tbody>
       </table>
       <p>
-        Dans la limite de 220 jours par an et sous réserve du respect des
-        congés d'ancienneté.
+        À retourner à Fabienne et Sylvestre chaque mois. Le <i>country
+        ambassador</i> signera le document par la suite.
       </p>
       <p lang='en'>
-        Within the limit of 220 days per year and subject to the
-        compliance with seniority vacation.
-      </p>
-      <section class='absence-codes'>
-        <h3>
-          Codes d'absence
-          <em lang='en'>(Absence codes)</em>
-        </h3>
-        <dl>
-          <dt>CP</dt>
-          <dd>Congés payés <span lang='en'>(Paid vacation)</span></dd>
-          <dt>JF</dt>
-          <dd>Jour férié <span lang='en'>(Rest day)</span></dd>
-          <dt>A</dt>
-          <dd>Anniversaire <span lang='en'>(B-day day off)</span></dd>
-          <dt>CSS</dt>
-          <dd>Congé sans solde <span lang='en'>(Unpaid leave)</span></dd>
-          <dt>R</dt>
-          <dd>Jour RTT</dd>
-          <dt>M</dt>
-          <dd>Arrêt maladie <span lang='en'>(Sickness)</span></dd>
-        </dl>
-      </section>
-      <p>
-        A retourner à Doris Coleman chaque mois, après avoir été validé par votre
-        supérieur hiérarchique.
-      </p>
-      <p lang='en'>
-        To be returned to Doris Coleman each month, after having been duly validated
-        by your Manager.
+        To be returned to Fabienne and Sylvestre each
+        month. The <i>country ambassador</i> will sign the document
+        later.
       </p>
       <footer>
         <div class='date-information'>Date: <span class='date-value'></span></div>
@@ -96,7 +65,7 @@
           <span class='editable-name'>
             <div data-persist='manager-last-name' contenteditable='true'>
             </div>
-            <span class='name-information'>[Le manager]</span>
+            <span class='name-information'>[Le responsable]</span>
           </span>
         </div>
       </footer>
@@ -111,26 +80,63 @@
       </div>
     </section>
 
-    <div id='week-template' hidden><!--
-    <label class='week-line week-${id} ${futureClass}' data-start='${weekStart}' data-end='${weekEnd}'>
-      <input type='checkbox'> Semaine du ${weekStartText} au ${weekEndText}
-    </label>
+    <div id='form-summary-template' hidden><!--
+        <tbody>
+            <tr>
+                <th>Nom (<em lang='en'>Lastname</em>)</th>
+                <td><span class='lastname' contenteditable='true' data-persist='lastname'>Lastname</span></td>
+            </tr>
+            <tr>
+                <th>Prénom (<em lang='en'>Firstname</em>)</th>
+                <td><span class='firstname' contenteditable='true' data-persist='firstname'>Firstname</span></td>
+            </tr>
+            <tr>
+                <th>Mois (<em lang='en'>month</em>)</th>
+                <td id='month'>${month}</td>
+            </tr>
+            <tr>
+                <th>Nombre de jours ouvrés dans le mois<br/>(<em lang='en'>Number of week-day of the month</em>) </th>
+                <td class='number' id='total-working-days'>${totalWorkingDays}</td>
+            </tr>
+            <tr>
+                <th>Total de jours travaillés <b>JT</b><br/>(<em lang='en'>Total number of days worked</em>)</th>
+                <td class='number' id='total-worked-days'>${JT}</td>
+            </tr>
+            <tr>
+                <th>Nombre de jours fériés <b>JF</b><br/>(<em lang='en'>Number of Bank holidays</em>)</th>
+                <td class='number' id='total-bank-holidays'>${JF}</td>
+            </tr>
+            <tr>
+                <th>Nombre de jours maladie <b>M</b><br/>(<em lang='en'>Number of Sick days</em>)</th>
+                <td class='number' id='number-sick-days'>${M}</td>
+            </tr>
+            <tr>
+                <th>Nombre de jours de congés payés pris <b>CP</b><br/>(<em lang='en'>Number of vacation days</em>)</th>
+                <td class='number' id='total-vacation-days'>${CP}</td>
+            </tr>
+            <tr>
+                <th>Nombre de jours non travaillés au titre de la RTT <b>JRTT</b><br/>(<em lang='en'>Number of days off in the frame work of the working time reduction</em>)</th>
+                <td class='number' id='total-rtt-days'>${JRTT}</td>
+            </tr>
+            <tr>
+                <th>Nombre de congés spéciaux <b>CS</b><br/>(<em lang='en'>Number of special days off</em>)</th>
+                <td class='number' id='total-special-days'>${CS}</td>
+            </tr>
+        </tbody>
     --></div>
 
     <div id='form-row-template' hidden><!--
       <tr class='absence-row'>
-        <th>Absence
+        <th>
           <div>Semaine du <span class='from'>${weekStart}</span> au <span class='to'>${weekEnd}</span></div>
           <div lang='en'>Week from <span class='from'>${weekStartUS}</span> to <span class='to'>${weekEndUS}</span></div>
         </th>
         ${cells}
-        <td class='total'>${total}</td>
       </tr>
     --></div>
     <div id='form-cell-template' hidden><!--
-      <td class='holiday-cell' data-holiday-index='${holidayIndex}'>
-        <button type='button' class='unlink-button' aria-title='This cell is linked to other cells for this holiday. Click to unlink.'></button>
-        <div contenteditable="true" class='${className}'>${type}</div>
+      <td class='holiday-cell'>
+        <div contenteditable="true" class='${className} ${classError}' data-week='${weekId}' data-day='${dayId}'>${type}</div>
       </td>
     --></div>
   </body>

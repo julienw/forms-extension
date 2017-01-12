@@ -74,6 +74,10 @@ td [contenteditable=true] {
 
 .has-content, [contenteditable=true]:focus, [data-persist] {
   border: 1px solid #ccc;
+											}
+
+.erroneous {
+	background: #FCC;
 }
 
 .unlink-button {
@@ -207,4 +211,21 @@ footer [contenteditable="true"] {
 
 .signature-editor-controls button {
   margin: .2em 0;
+}
+
+.summary th {
+	text-align: left;
+}
+.summary td {
+	text-align: left;
+}
+.summary #month {
+	padding-left: 18px;
+}
+.summary td.number {
+	padding-left: 18px;
+}
+
+.summary th b {
+	color: #900;
 }

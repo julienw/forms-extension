@@ -1,7 +1,7 @@
 /*jshint esnext: true */
 (function(exports) {
 
-var Utils = exports.Utils = {
+exports.Utils = {
   throttle(func, delay) {
     var timeout;
 
@@ -15,4 +15,4 @@ var Utils = exports.Utils = {
     };
   }
 };
-})(window);
+})(typeof window === 'object' ? window : exports);

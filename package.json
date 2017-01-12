@@ -1,10 +1,12 @@
 {
   "name": "forms-extension",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Used by french employees to generate their holiday form",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint src lib",
+    "start": "cd src && jpm run",
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -20,7 +22,10 @@
   },
   "homepage": "https://github.com/julienw/forms-extension#readme",
   "devDependencies": {
+    "chai": "^3.5.0",
+    "eslint": "^3.13.1",
     "jpm": "1.0.1",
+    "mocha": "^3.2.0",
     "semver": "5.0.1"
   }
 }

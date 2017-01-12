@@ -1,4 +1,5 @@
 /*jshint esnext: true */
+/* global cloneInto */
 
 self.port.on(
   'show', (holidays) => {
@@ -9,4 +10,3 @@ self.port.on(
     document.documentElement.dispatchEvent(event);
   }
 );
-

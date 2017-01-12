@@ -1,260 +1,194 @@
 /*jshint esnext: true */
+/* global utcDate, Template, fakeData, restoreSavedValues, monthWeekTable, updateWeeksWithHolidays */
 
 (function(exports) {
-'use strict';
+  'use strict';
 
-var templates = {
-  week: new Template('week-template'),
-  ptoRow: new Template('form-row-template'),
-  ptoCell: new Template('form-cell-template')
-};
+  var templates = {
+    ptoRow: new Template('form-row-template'),
+    ptoCell: new Template('form-cell-template'),
+    ptoSummary: new Template('form-summary-template')
+  };
 
-var weeks;
-var holidays;
-var range = document.querySelector('.easy-selector-range');
-var form = document.querySelector('.choose-weeks-form');
-var sections = {
-  choose: document.querySelector('.choose-form'),
-  pto: document.querySelector('.pto-form')
-};
-var future = document.querySelector('.show-future-checkbox');
-var ptoTable = document.querySelector('.worked-days-table');
+  var WORKING_DAY_TYPES = ['JT', 'CP', 'JRTT', 'M', 'CS'];
 
-initRange();
-initForm();
-initFuture();
-initFakeData();
-initCommunication();
+  var ptoTable = document.querySelector('.worked-days-table tbody');
+  var ptoSummaryTable = document.querySelector('.summary');
 
-function initCommunication() {
-  window.addEventListener('show-holidays', (e) => show(e.detail));
-}
+  var DEFAULT_SUMMARY_VALUES = {
+    totalWorkingDays: 0,
+    JT: 0,
+    JF: 0,
+    M: 0,
+    CP: 0,
+    JRTT: 0,
+    CS: 0,
+  };
 
-function initFakeData() {
-  if (window.location.protocol !== 'resource:') {
-    // we're not in the addon
-    range.value = 15;
-    show(fakeData);
-    //generatePTOForm();
+  var state = getDefaultState();
+  refreshWeeks();
+
+  // Load PTO data
+  initCommunication();
+  initFakeData();
+
+  generatePTOForm();
+
+  function initCommunication() {
+    // Get back the PTO holidays from the PTO tool.
+    window.addEventListener('show-holidays', (e) => loadPTOData(e.detail));
   }
-}
 
-/**
- * @typedef {Object} HolidayWeek
- * @property {Date} start
- * @property {Date} end
- * @property {Date} holidayStart
- * @property {Date} holidayEnd
- * @property {String} [type] Only the type of the first week in a holiday is
- * taken into account.
- *
- * @typedef {Array.<HolidayWeek>} Holiday
- */
-/**
- * @param {Array.<Holiday>} aHolidays
- */
-function show(aHolidays) {
-  weeks = [];
-  holidays = aHolidays;
+  function initFakeData() {
+    if (window.location.protocol !== 'resource:') {
+      // We're not in the addon
+      loadPTOData(fakeData);
+    }
+  }
 
-  holidays.forEach((holiday, holidayIdx) => {
-    holiday.forEach(week => {
-      week.holidayWeek = getHolidayWeek(week, holidayIdx);
-      //delete week.holidayStart;
-      //delete week.holidayEnd;
-      weeks.push(week);
-    });
-  });
+  function getDefaultState() {
+    var state = {};
+    var today = new Date();
+    state.currentMonth = today.getUTCMonth();
+    state.currentYear = today.getUTCFullYear();
+    if (state.currentMonth === 0) {
+      state.currentMonth = 12;
+      --state.currentYear;
+    }
+    return state;
+  }
 
-  weeks = sortAndMerge(weeks);
-  findFuture(weeks);
-  configureRange();
-  displayWeeks();
-  onRangeChange();
-}
+  function refreshWeeks() {
+    state.weeks = monthWeekTable(state.currentYear, state.currentMonth)
+      .filter(week => week.some(day => ![null, 'WE'].includes(day.type)));
+  }
 
-function onRangeChange() {
-  weeks.forEach((week, id) => {
-    var limit = range.valueAsNumber;
-    var input = document.querySelector(`.week-${id} input`);
-    input.checked = id < limit;
-    onCheckboxChange(input);
-  });
-}
+  function loadPTOData(holidays) {
+    state.holidays = holidays;
+    if (state.hasOwnProperty("weeks")) {
+      state.weeks = updateWeeksWithHolidays(state);
+      generatePTOForm();
+    }
+  }
 
-function initRange() {
-  range.addEventListener('input', onRangeChange);
-}
+  function changeMonthUp() {
+    state.currentMonth++;
+    if (state.currentMonth > 12) {
+      state.currentMonth = 1;
+      state.currentYear++;
+    }
+    refreshWeeks();
+    state.weeks = updateWeeksWithHolidays(state);
+    generatePTOForm();
+  }
 
-function onCheckboxChange(checkbox) {
-  checkbox.parentNode.classList.toggle('selected', checkbox.checked);
-}
+  function changeMonthDown() {
+    state.currentMonth--;
+    if (state.currentMonth < 1) {
+      state.currentMonth = 12;
+      state.currentYear--;
+    }
+    refreshWeeks();
+    state.weeks = updateWeeksWithHolidays(state);
+    generatePTOForm();
+  }
 
-function initForm() {
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
+  function updateModel(weekId, dayId, type) {
+    var nbHours = 8;
+    if (type.startsWith("0.5") || type.startsWith("1/2") || type.startsWith("0,5")) {
+      nbHours = 4;
+    }
+    type = /[A-Z]+/.exec(type.toUpperCase())[0];
+
+    const day = state.weeks[weekId][dayId];
+    day.type = type;
+    day.hours = nbHours;
+    day.error = !Object.keys(DEFAULT_SUMMARY_VALUES).includes(type);
 
     generatePTOForm();
-  });
+  }
 
-  form.addEventListener('change', (e) => {
-    if (e.target.matches('input[type=checkbox]')) {
-      onCheckboxChange(e.target);
-    }
-  });
-}
+  function setSummary(currentMonthDate, options) {
+    var interpolateSummaryData = Object.assign({
+      month: currentMonthDate.toLocaleString('en-us', {month: "long", year: "numeric"}),
+    }, DEFAULT_SUMMARY_VALUES, options);
 
-function initFuture() {
-  future.addEventListener('change', () => {
-    form.classList.toggle('hide-future', !future.checked);
-  });
-}
+    ptoSummaryTable.innerHTML = templates.ptoSummary.interpolate(interpolateSummaryData);
+  }
 
-function generatePTOForm() {
-  sections.choose.hidden = true;
-  var weeksToDisplay = weeks.filter((week, id) => {
-    var includeFuture = future.checked;
-    var isFuture = week.future;
-    var input = document.querySelector(`.week-${id} input`);
-    var isChecked = input.checked;
+  function generatePTOForm() {
+    ptoTable.innerHTML = '';
 
-    return (!isFuture || includeFuture) && isChecked;
-  }).sort((a, b) => a.start - b.start);
+    var currentMonthDate = utcDate(state.currentYear, state.currentMonth, 1);
+    var summary = Object.assign({}, DEFAULT_SUMMARY_VALUES);
 
-  weeksToDisplay.forEach((week, id) => {
-    var interpolateData = {
-      id,
-      weekStart: week.start.toLocaleDateString(),
-      weekEnd: week.end.toLocaleDateString(),
-      weekStartUS: week.start.toLocaleDateString('en-US'),
-      weekEndUS: week.end.toLocaleDateString('en-US'),
-      cells: ''
-    };
-
-    interpolateData.total = week.holidayWeek.filter((holidayIdx, i) => {
-      var isHoliday = holidayIdx >= 0;
-
-      var cellData = {
-        holidayIndex: holidayIdx,
-        className: isHoliday ? 'has-content' : '',
-        type: 
-          isHoliday ?
-          holidays[holidayIdx][0].type || 'CP' :
-          ''
+    state.weeks.forEach((week, week_id) => {
+      var days = week.filter((i) => i !== null);
+      var firstDay = days[0].date;
+      var lastDay = days[days.length - 3].date;
+      var interpolateData = {
+        id: week_id,
+        weekStart: firstDay.toLocaleDateString("fr-FR"),
+        weekEnd: lastDay.toLocaleDateString("fr-FR"),
+        weekStartUS: firstDay.toLocaleDateString('en-US'),
+        weekEndUS: lastDay.toLocaleDateString('en-US'),
+        cells: ''
       };
 
-      interpolateData.cells += templates.ptoCell.interpolate(cellData);
+      week.forEach((day, day_id) => {
+        var cellData;
+        if ([0, 6].includes(day.date.getUTCDay())) {
+          return;
+        }
 
-      return isHoliday;
-    }).length;
+        if (!day.type) {
+          cellData = {
+            id: 'day-' + week_id + '_' + day_id,
+            className: '',
+            type: '',
+            weekId: week_id,
+            dayId: day_id
+          };
+          interpolateData.cells += templates.ptoCell.interpolate(cellData);
+        } else {
+          // Increment counters
+          summary[day.type] += day.hours / 8;
+          summary.JT += 1 - (day.hours / 8);
+          if (WORKING_DAY_TYPES.includes(day.type)) {
+            summary.totalWorkingDays++;
+          }
 
-    /* Data is sanitized by the Template library. */
-    ptoTable.insertAdjacentHTML(
-      'beforeend',
-      templates.ptoRow.interpolate(
-        interpolateData, { safe: ['cells']}
-      )
-    );
-  });
+          cellData = {
+            id: 'day-' + week_id + '_' + day_id,
+            className: 'has-content',
+            type: (day.hours === 4 ? '0.5 ' : '') + day.type,
+            weekId: week_id,
+            dayId: day_id,
+            classError: day.error ? 'erroneous' : ''
+          };
+          interpolateData.cells += templates.ptoCell.interpolate(cellData);
+        }
+      });
 
-  document.querySelector('.date-value').textContent = new Date().toLocaleDateString();
-  sections.pto.hidden = false;
 
-  setTimeout(() => window.dispatchEvent(new CustomEvent('table-displayed')));
-}
-
-function configureRange() {
-  range.max = weeks.length;
-}
-
-/**
- * Inversely chronologically sort the weeks, and merge identical ones.
- *
- * We expect weeks to be properly structured already.
- */
-function sortAndMerge(weeks) {
-  weeks = weeks.sort((weekA, weekB) => weekB.start - weekA.start);
-
-  weeks = weeks.reduce((weeks, week) => {
-    if (!weeks.length) {
-      weeks.push(week);
-      return weeks;
-    }
-
-    var previous = weeks[weeks.length - 1];
-    if (+previous.start === +week.start) {
-      // same week => merge to the previous one
-      previous.holidayWeek = previous.holidayWeek.map(
-        (bool, i) => bool || week.holidayWeek[i]
+      /* Data is sanitized by the Template library. */
+      ptoTable.insertAdjacentHTML(
+        'beforeend',
+        templates.ptoRow.interpolate(
+          interpolateData, { safe: ['cells']}
+        )
       );
-      return weeks;
-    }
+    });
 
-    weeks.push(week);
-    return weeks;
-  }, []);
+    setSummary(currentMonthDate, summary);
+    document.querySelector('.date-value').textContent = new Date().toLocaleDateString("fr-FR");
 
-  return weeks;
-}
-
-function findFuture(weeks) {
-  weeks.forEach((week) => {
-    week.future = week.end > Date.now();
-  });
-}
-
-/**
- * Returns an array of 5 elements, with booleans indicating whether each day of
- * the week is part of the holiday.
- *
- * @returns {Array.<Integer>} < 0 if it's not an holiday, or the holiday index
- */
-function getHolidayWeek(week, holidayIdx) {
-  // convert back from json
-  ['start', 'end', 'holidayStart', 'holidayEnd'].forEach(prop => {
-    week[prop] = new Date(week[prop]);
-  });
-
-  var holidayWeek = new Array(5);
-  var firstDay = week.start.getUTCDate();
-  for (var i = 0; i < 5; i++) {
-    var curDate = new Date(+week.start);
-    curDate.setUTCDate(firstDay + i);
-    var isHoliday = week.holidayStart <= curDate && curDate <= week.holidayEnd;
-    holidayWeek[i] = isHoliday ? holidayIdx : -1;
+    setTimeout(() => window.dispatchEvent(new CustomEvent('table-displayed')));
+    restoreSavedValues();
   }
-  return holidayWeek;
-}
 
-function displayWeeks() {
-  var form = document.querySelector('.choose-weeks-form');
-  var opts = { day: "numeric", month: 'long', year: "numeric" };
-  weeks.forEach((week, id) => {
-    /* Data is sanitized by the Template library. */
-    form.insertAdjacentHTML('beforeend', templates.week.interpolate({
-      id,
-      weekStart: week.start,
-      weekEnd: week.end,
-      weekStartText: week.start.toLocaleDateString(undefined, opts),
-      weekEndText: week.end.toLocaleDateString(undefined, opts),
-      futureClass: week.future ? 'week-future' : ''
-    }));
-  });
-}
-
-// taken from the gaia sms app
-var rdashes = /-(.)/g;
-function camelCase(str) {
-  return str.replace(rdashes, function replacer(str, p1) {
-    return p1.toUpperCase();
-  });
-}
-
-exports.generateForm = show;
-exports.Debug = {
-  debugMyData() {
-    return { weeks, holidays };
-  }
-};
+  exports.changeMonthUp = changeMonthUp;
+  exports.changeMonthDown = changeMonthDown;
+  exports.updateModel = updateModel;
 
 })(window);

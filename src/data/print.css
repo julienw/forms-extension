@@ -1,0 +1,8 @@
+table.summary td {
+    padding-left: 13px;
+    text-align: left;
+}
+
+#monthUp, #monthDown {
+    display: none;
+}

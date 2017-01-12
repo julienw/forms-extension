@@ -61,10 +61,6 @@ function onKey(e) {
   }
 }
 
-function detachKeyboardListeners() {
-  window.removeEventListener('keydown', onKey);
-}
-
 function enterEditor(e) {
   persistKey = e.target.dataset.persist;
   var existingData = e.target.dataset.blobUrl;
