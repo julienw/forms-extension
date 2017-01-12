@@ -1,8 +1,9 @@
 var expect = require('chai').expect;
 var Calendar = require('../src/data/calendar');
 
-const {utcDate, getFrenchBankHolidays, getBoxingDays} = require('../src/data/french-bank-holidays');
+const {utcDate, addDays, getFrenchBankHolidays, getBoxingDays} = require('../src/data/french-bank-holidays');
 global.utcDate = utcDate;
+global.addDays = addDays;
 global.getFrenchBankHolidays = getFrenchBankHolidays;
 global.getBoxingDays = getBoxingDays;
 
@@ -30,9 +31,9 @@ describe("Calendar", () => {
         // ensure every day of each week has a null type whenever the day is not
         // part of the target month
         days.forEach(day => {
-          if (day.date.getMonth() !== 0) {
+          if (day.date.getUTCMonth() !== 0) {
             expect(day.type).to.be.a("null");
-          } else if (day.date.getDay() === 0) {
+          } else if (day.date.getUTCDay() === 0) {
             expect(day.type).eql("WE");
           } else {
             expect(day.type).to.be.a("string");

@@ -1,4 +1,4 @@
-/* global utcDate, getBoxingDays, getFrenchBankHolidays */
+/* global utcDate, addDays, getBoxingDays, getFrenchBankHolidays */
 (function(exports) {
   "use strict";
 
@@ -32,7 +32,7 @@
     // month is in the range 1..12
     var firstOfMonth = utcDate(year, month, 1);
     var lastOfMonth = utcDate(year, month + 1, 0);
-    var used = firstOfMonth.getUTCDay() + 6 + lastOfMonth.getDate();
+    var used = firstOfMonth.getUTCDay() + 6 + lastOfMonth.getUTCDate();
     var numberOfWeeks = Math.ceil(used / 7);
 
     var weeks = [];
@@ -76,58 +76,70 @@
     });
   }
 
-  function isInCurrentMonth(startDate, endDate, month, year) {
-    return startDate.getUTCMonth() <= month - 1 &&
-           startDate.getFullYear() <= year &&
-           endDate.getUTCMonth() >= month - 1 &&
-           endDate.getFullYear() >= year;
+  function isInCurrentMonth(startDate, endDate, {currentMonth, currentYear}) {
+    return startDate.getUTCMonth() <= currentMonth - 1 &&
+           startDate.getUTCFullYear() <= currentYear &&
+           endDate.getUTCMonth() >= currentMonth - 1 &&
+           endDate.getUTCFullYear() >= currentYear;
+  }
+
+  function isDayPartOfHolidays(day, startDate, endDate) {
+    return startDate <= day.date && endDate >= day.date;
+  }
+
+  function isWeekend(date) {
+    return [0, 6].includes(date.getUTCDay());
   }
 
   function updateWeeksWithHolidays(state) {
     // Update the weeks data with the PTO infos for the current month.
     state.holidays.forEach(({start, end, hours, comment}) => {
-      const startDate = new Date(start);
-      const endDate = new Date(end);
+      let startDate = new Date(start);
+      let endDate = new Date(end);
 
       // Handle case where holidays ends on a week-end
-      while ([0, 6].includes(endDate.getUTCDay())) {
-        endDate.setDate(endDate.getDate() - 1);
+      while (isWeekend(endDate)) {
+        endDate = addDays(endDate, -1);
       }
 
-      // Is in current month?
-      if (isInCurrentMonth(startDate, endDate, state.currentMonth, state.currentYear)) {
-        // Someday of this holiday are in the current month
-        var type = guessTypeFromComment(comment);
+      // Break if holiday is not part of current Month
+      if (!isInCurrentMonth(startDate, endDate, state)) {
+        return;
+      }
 
-        state.weeks.forEach(week => {
-          week.forEach(day => {
-            if (startDate <= day.date && endDate >= day.date) {
-              var isLast = endDate.toJSON() === day.date.toJSON();
-              if (day.type !== 'WE') {
-                if (day.type == 'JT') {
-                  day.type = type;
-                  // If there is still more than 8 hours, it is probably a full day off
-                  if (hours > 8) {
-                    hours -= 8;
-                  } else if (hours > 0) {
-                    if (!isLast) {
-                      day.hours = 4;
-                      hours -= 4;
-                    } else {
-                      // If there is less, it is probably an half day off.
-                      day.hours = hours;
-                      hours = 0;
-                    }
-                  }
+      const guessedType = guessTypeFromComment(comment);
+
+      state.weeks.forEach((week) => {
+        // Process holiday information for this week
+        week
+          // Process only days part of current holiday perdiod
+          .filter((day) => isDayPartOfHolidays(day, startDate, endDate))
+          // Exclude week-ends
+          .filter((day) => day.type !== "WE")
+          // Update week working days information with holiday ones
+          .forEach((day) => {
+            const isLast = endDate.toJSON() === day.date.toJSON();
+            if (day.type === "JT") {
+              day.type = guessedType;
+              // If there is still more than 8 hours, it is probably a full day off
+              if (hours > 8) {
+                hours -= 8;
+              } else if (hours > 0) {
+                if (!isLast) {
+                  day.hours = 4;
+                  hours -= 4;
                 } else {
-                  // A CS or JF is always 8 hours
-                  hours -= 8;
+                  // If there is less, it is probably an half day off.
+                  day.hours = hours;
+                  hours = 0;
                 }
               }
+            } else {
+              // A CS or JF is always 8 hours
+              hours -= 8;
             }
-          });
         });
-      }
+      });
     });
     return state.weeks;
   }
