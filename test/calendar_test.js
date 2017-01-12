@@ -1,7 +1,8 @@
 var expect = require('chai').expect;
 var Calendar = require('../src/data/calendar');
 
-const {getFrenchBankHolidays, getBoxingDays} = require('../src/data/french-bank-holidays');
+const {utcDate, getFrenchBankHolidays, getBoxingDays} = require('../src/data/french-bank-holidays');
+global.utcDate = utcDate;
 global.getFrenchBankHolidays = getFrenchBankHolidays;
 global.getBoxingDays = getBoxingDays;
 
@@ -151,8 +152,8 @@ describe("Calendar", () => {
       state = {
         weeks: Calendar.monthWeekTable(2017, 1),
         holidays: [{
-          start: new Date(2017, 0, 2),
-          end: new Date(2017, 0, 8),
+          start: utcDate(2017, 1, 2),
+          end: utcDate(2017, 1, 8),
           comment: 'RTT',
           hours: 32
         }],
@@ -166,31 +167,31 @@ describe("Calendar", () => {
       // The first week of January only contains Sunday 1st.
       expect(weeks[1])
         .eql([
-          {'date': new Date(2017, 0, 2),
+          {'date': utcDate(2017, 1, 2),
            'hours': 8,
            'type': 'CS'
           },
-          {'date': new Date(2017, 0, 3),
+          {'date': utcDate(2017, 1, 3),
            'hours': 8,
            'type': 'JRTT'
           },
-          {'date': new Date(2017, 0, 4),
+          {'date': utcDate(2017, 1, 4),
            'hours': 8,
            'type': 'JRTT'
           },
-          {'date': new Date(2017, 0, 5),
+          {'date': utcDate(2017, 1, 5),
            'hours': 4,
            'type': 'JRTT'
           },
-          {'date': new Date(2017, 0, 6),
+          {'date': utcDate(2017, 1, 6),
            'hours': 4,
            'type': 'JRTT'
           },
-          {'date': new Date(2017, 0, 7),
+          {'date': utcDate(2017, 1, 7),
            'hours': 8,
            'type': 'WE'
           },
-          {'date': new Date(2017, 0, 8),
+          {'date': utcDate(2017, 1, 8),
            'hours': 8,
            'type': 'WE'
           }
@@ -199,8 +200,8 @@ describe("Calendar", () => {
 
     it("should handle last day as half day.", () => {
       state.holidays = [{
-        start: new Date(2017, 0, 2),
-        end: new Date(2017, 0, 8),
+        start: utcDate(2017, 1, 2),
+        end: utcDate(2017, 1, 8),
         comment: 'RTT',
         hours: 36
       }];
@@ -209,31 +210,31 @@ describe("Calendar", () => {
       // The first week of January only contains Sunday 1st.
       expect(weeks[1])
         .eql([
-          {'date': new Date(2017, 0, 2),
+          {'date': utcDate(2017, 1, 2),
            'hours': 8,
            'type': 'CS'
           },
-          {'date': new Date(2017, 0, 3),
+          {'date': utcDate(2017, 1, 3),
            'hours': 8,
            'type': 'JRTT'
           },
-          {'date': new Date(2017, 0, 4),
+          {'date': utcDate(2017, 1, 4),
            'hours': 8,
            'type': 'JRTT'
           },
-          {'date': new Date(2017, 0, 5),
+          {'date': utcDate(2017, 1, 5),
            'hours': 8,
            'type': 'JRTT'
           },
-          {'date': new Date(2017, 0, 6),
+          {'date': utcDate(2017, 1, 6),
            'hours': 4,
            'type': 'JRTT'
           },
-          {'date': new Date(2017, 0, 7),
+          {'date': utcDate(2017, 1, 7),
            'hours': 8,
            'type': 'WE'
           },
-          {'date': new Date(2017, 0, 8),
+          {'date': utcDate(2017, 1, 8),
            'hours': 8,
            'type': 'WE'
           }
@@ -242,8 +243,8 @@ describe("Calendar", () => {
 
     it("should handle two last days as half day.", () => {
       state.holidays = [{
-        start: new Date(2017, 0, 2),
-        end: new Date(2017, 0, 8),
+        start: utcDate(2017, 1, 2),
+        end: utcDate(2017, 1, 8),
         comment: 'RTT',
         hours: 32
       }];
@@ -252,37 +253,35 @@ describe("Calendar", () => {
       // The first week of January only contains Sunday 1st.
       expect(weeks[1])
         .eql([
-          {'date': new Date(2017, 0, 2),
+          {'date': utcDate(2017, 1, 2),
            'hours': 8,
            'type': 'CS'
           },
-          {'date': new Date(2017, 0, 3),
+          {'date': utcDate(2017, 1, 3),
            'hours': 8,
            'type': 'JRTT'
           },
-          {'date': new Date(2017, 0, 4),
+          {'date': utcDate(2017, 1, 4),
            'hours': 8,
            'type': 'JRTT'
           },
-          {'date': new Date(2017, 0, 5),
+          {'date': utcDate(2017, 1, 5),
            'hours': 4,
            'type': 'JRTT'
           },
-          {'date': new Date(2017, 0, 6),
+          {'date': utcDate(2017, 1, 6),
            'hours': 4,
            'type': 'JRTT'
           },
-          {'date': new Date(2017, 0, 7),
+          {'date': utcDate(2017, 1, 7),
            'hours': 8,
            'type': 'WE'
           },
-          {'date': new Date(2017, 0, 8),
+          {'date': utcDate(2017, 1, 8),
            'hours': 8,
            'type': 'WE'
           }
         ]);
     });
-});
-
-
+  });
 });

@@ -3,6 +3,10 @@
 (function(exports) {
 'use strict';
 
+function utcDate(year, month, day) {
+  return new Date(Date.UTC(year, month - 1, day));
+}
+
 // Taken from https://github.com/commenthol/date-easter/blob/bbdd1a3/index.js#L53-L89
 function _easter (year, julian, gregorian) {
     let k = Math.floor(year / 100)
@@ -33,21 +37,21 @@ function _easter (year, julian, gregorian) {
       day -= daysPerMonth[month]
     }
 
-    return new Date(year, month - 1, day)
+    return utcDate(year, month, day)
 }
 
-function sortHolidays(previousDay, currentDay) {
-  // Compare months
-  if (previousDay[0] < currentDay[0]) return -1;
-  if (previousDay[0] > currentDay[0]) return 1;
-  // Compare days
-  if (previousDay[1] < currentDay[1]) return -1;
-  if (previousDay[1] > currentDay[1]) return 1;
-  return 0;
+function sortHolidays(previous, current) {
+  if (previous.date < current.date) {
+    return -1;
+  } else if (previous.date > current.date) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 function addDays(date, days) {
-  return new Date(date.getTime() + (days * 86400 * 1000))
+  return new Date(date.getTime() + (days * 86400 * 1000));
 }
 
 function isSaturday(date) {
@@ -60,51 +64,51 @@ function isSunday(date) {
 
 function getFrenchBankHolidays(year) {
   const holidays = [
-    [1, 1, 'New Years Day'],
-    [5, 1, "Labour Day"],
-    [5, 8, "Victory in Europe Day"],
-    [7, 14, "Bastille Day"],
-    [8, 15, "Assumption Day"],
-    [11, 1, "All Saints Day"],
-    [11, 11, "Armistice Day"],
-    [12, 25, "Christmas Day"],
+    {date: utcDate(year, 1, 1), name: 'New Years Day'},
+    {date: utcDate(year, 5, 1), name: "Labour Day"},
+    {date: utcDate(year, 5, 8), name: "Victory in Europe Day"},
+    {date: utcDate(year, 7, 14), name: "Bastille Day"},
+    {date: utcDate(year, 8, 15), name: "Assumption Day"},
+    {date: utcDate(year, 11, 1), name: "All Saints Day"},
+    {date: utcDate(year, 11, 11), name: "Armistice Day"},
+    {date: utcDate(year, 12, 25), name: "Christmas Day"},
   ];
 
   // Include easter Monday
   let easter = _easter(year);
   let easterMonday = addDays(easter, 1);
-
-  holidays.push([easterMonday.getMonth() + 1, easterMonday.getDate(), "Easter monday"]);
+  holidays.push({date: easterMonday, name: "Easter monday"});
 
   // Include ascension
   let ascensionThursday = addDays(easter, 39);
-  holidays.push([ascensionThursday.getMonth() + 1, ascensionThursday.getDate(), "Ascension Thursday"]);
+  holidays.push({date: ascensionThursday, name: "Ascension Thursday"});
 
-  return holidays.sort(sortHolidays);
+  return holidays.slice(0).sort(sortHolidays);
 }
 
 function getBoxingDays(year, holidays) {
   const boxing = holidays.reduce((boxing, holiday) => {
-    let holidayDate = new Date(year, holiday[0] - 1, holiday[1]);
     // When the holiday is a Saturday, the previous Friday is a holiday
-    if (isSaturday(holidayDate)) {
-      // XXX when holidays use dates, addDays(holiday, -7)
-      let previousFriday = new Date(year, holiday[0] - 1, holiday[1] - 1);
-      return [...boxing, [previousFriday.getMonth() + 1, previousFriday.getDate(), holiday[2] + " (observed)"]];
+    if (isSaturday(holiday.date)) {
+      const previousFriday = addDays(holiday.date, -1)
+      return [...boxing, {date: previousFriday, name: `${holiday.name} (observed)`}];
     }
     // When the holiday is a Sunday, the next Monday is a holiday
-    if (isSunday(holidayDate)) {
-      let nextMonday = new Date(year, holiday[0] - 1, holiday[1] + 1);
-      return [...boxing, [nextMonday.getMonth() + 1, nextMonday.getDate(), holiday[2] + " (observed)"]];
+    if (isSunday(holiday.date)) {
+      const nextMonday = addDays(holiday.date, 1)
+      return [...boxing, {date: nextMonday, name: `${holiday.name} (observed)`}];
     }
     return boxing
   }, []);
-  let nextNewYear = new Date(year + 1, 0, 1);
+  // Handle upcoming New Year's Day
+  const nextNewYear = utcDate(year + 1, 1, 1);
   if (isSaturday(nextNewYear)) {
-    boxing.push([12, 31, "New Years Day (observed)"]);
+    boxing.push({date: utcDate(year, 12, 31), name: "New Years Day (observed)"});
   }
   return boxing;
 }
+exports.utcDate = utcDate;
+exports.addDays = addDays;
 exports.getFrenchBankHolidays = getFrenchBankHolidays;
 exports.getBoxingDays = getBoxingDays;
 

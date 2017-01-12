@@ -1,4 +1,4 @@
-/* global getBoxingDays, getFrenchBankHolidays */
+/* global utcDate, getBoxingDays, getFrenchBankHolidays */
 (function(exports) {
   "use strict";
 
@@ -20,18 +20,20 @@
     return type || 'CP';
   }
 
-  function zfill(val) {
-    return ("0" + val).slice(-2);
+  function formatDateString(date) {
+    return date.toLocaleString('en-GB', {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    });
   }
 
-  function monthWeekTable(year, month_number) {
-
-    // month_number is in the range 1..12
-
-    var firstOfMonth = new Date(year, month_number-1, 1);
-    var lastOfMonth = new Date(year, month_number, 0);
+  function monthWeekTable(year, month) {
+    // month is in the range 1..12
+    var firstOfMonth = utcDate(year, month, 1);
+    var lastOfMonth = utcDate(year, month + 1, 0);
     var used = firstOfMonth.getDay() + 6 + lastOfMonth.getDate();
-    var numberOfWeeks = Math.ceil( used / 7);
+    var numberOfWeeks = Math.ceil(used / 7);
 
     var weeks = [];
     for (var i = 0; i < numberOfWeeks; i++) {
@@ -41,9 +43,9 @@
 
     var frenchBankHolidays = getFrenchBankHolidays(year)
     var bankHolidays = frenchBankHolidays
-        .map(holiday => year + "-" + zfill(holiday[0]) + "-" + zfill(holiday[1]));
+        .map((holiday) => formatDateString(holiday.date));
     var boxingDays = getBoxingDays(year, frenchBankHolidays)
-        .map(holiday => year + "-" + zfill(holiday[0]) + "-" + zfill(holiday[1]));
+        .map((holiday) => formatDateString(holiday.date));
 
     if (year < 2017) boxingDays = [];
 
@@ -51,10 +53,10 @@
       return week.map((day, dayIndex) => {
         var globalIndex = weekIndex * 7 + dayIndex;
         var dayOfMonth = globalIndex - firstWeekDayOfMonth + 1;
-        day.date = new Date(year, month_number-1, dayOfMonth);
+        day.date = utcDate(year, month, dayOfMonth);
 
-        if (day.date.getMonth() === month_number - 1) {
-          var currentDate = year + "-" + zfill(day.date.getMonth() + 1) + "-" + zfill(dayOfMonth);
+        if (day.date.getMonth() === month - 1) {
+          var currentDate = formatDateString(day.date);
           day.hours = 8;
           if ([0, 6].includes(day.date.getDay())) {
             day.hours = 8;
@@ -76,30 +78,22 @@
 
   function updateWeeksWithHolidays(state) {
     // Update the weeks data with the PTO infos for the current month.
-    state.holidays.forEach((holiday) => {
-      // Is in current month?
-      var start = new Date(holiday.start);
-      var end = new Date(holiday.end);
-
+    state.holidays.forEach(({start, end, hours, comment}) => {
       // Handle case where holidays ends on a week-end
       while ([0, 6].includes(end.getDay())) {
         end.setDate(end.getDate() - 1);
       }
 
+      // Is in current month?
       if (start.getMonth() <= state.currentMonth - 1 && start.getFullYear() <= state.currentYear &&
-          end.getMonth() >= state.currentMonth -1 && end.getFullYear() >= state.currentYear) {
+          end.getMonth() >= state.currentMonth - 1 && end.getFullYear() >= state.currentYear) {
         // Someday of this holiday are in the current month
-        var hours = holiday.hours;
-        var type = guessTypeFromComment(holiday.comment);
+        var type = guessTypeFromComment(comment);
 
         state.weeks.forEach(week => {
           week.forEach(day => {
-            var currentDayText = day.date.getFullYear() + '-' + zfill(day.date.getMonth() - 1) + '-' + zfill(day.date.getDate());
-            var startDayText = start.getFullYear() + '-' + zfill(start.getMonth() - 1) + '-' + zfill(start.getDate());
-            var endDayText = end.getFullYear() + '-' + zfill(end.getMonth() - 1) + '-' + zfill(end.getDate());
-
-            if (startDayText <= currentDayText && endDayText >= currentDayText) {
-              var isLast = endDayText == currentDayText;
+            if (start <= day.date && end >= day.date) {
+              var isLast = end.toJSON() === day.date.toJSON();
               if (day.type !== 'WE') {
                 if (day.type == 'JT') {
                   day.type = type;
