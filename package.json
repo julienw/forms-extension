@@ -24,7 +24,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "eslint": "^3.13.1",
-    "jpm": "1.0.1",
+    "jpm": "1.2.2",
     "mocha": "^3.2.0",
     "semver": "5.0.1"
   }
