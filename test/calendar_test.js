@@ -309,7 +309,7 @@ describe("Calendar", () => {
       });
     });
 
-    it('should handle holidays that is between 2 months', function() {
+    it('should handle holidays that are between 2 months', function() {
       const startDate = new Date('2017-01-25T00:00:00Z');
       const endDate = new Date('2017-02-03T00:00:00Z');
       const trueStates = [
@@ -336,7 +336,7 @@ describe("Calendar", () => {
       });
     });
 
-    it('should handle holidays that is between 3 months', function() {
+    it('should handle holidays that are between 3 months', function() {
       const startDate = new Date('2017-01-25T00:00:00Z');
       const endDate = new Date('2017-03-03T00:00:00Z');
 
@@ -367,7 +367,7 @@ describe("Calendar", () => {
       });
     });
 
-    it('should handle holidays that is between 2 years', function() {
+    it('should handle holidays that are between 2 years', function() {
       const startDate = new Date('2016-12-26T00:00:00Z');
       const endDate = new Date('2017-01-04T00:00:00Z');
 
