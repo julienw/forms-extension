@@ -55,13 +55,13 @@
         var dayOfMonth = globalIndex - firstWeekDayOfMonth + 1;
         day.date = utcDate(year, month, dayOfMonth);
 
-        if (day.date.getUTCMonth() === month - 1) {
+        if ([0, 6].includes(day.date.getUTCDay())) {
+          day.hours = 8;
+          day.type = 'WE';
+        } else if (day.date.getUTCMonth() === month - 1) {
           var currentDate = formatDateString(day.date);
           day.hours = 8;
-          if ([0, 6].includes(day.date.getUTCDay())) {
-            day.hours = 8;
-            day.type = 'WE';
-          } else if (bankHolidays.includes(currentDate)) {
+          if (bankHolidays.includes(currentDate)) {
             day.type = 'JF';
           } else if (boxingDays.includes(currentDate)) {
             day.type = 'CS';
@@ -77,10 +77,18 @@
   }
 
   function isInCurrentMonth(startDate, endDate, {currentMonth, currentYear}) {
-    return startDate.getUTCMonth() <= currentMonth - 1 &&
-           startDate.getUTCFullYear() <= currentYear &&
-           endDate.getUTCMonth() >= currentMonth - 1 &&
-           endDate.getUTCFullYear() >= currentYear;
+    const startYear = startDate.getUTCFullYear();
+    const startMonth = startDate.getUTCMonth() + 1;
+    const endYear = endDate.getUTCFullYear();
+    const endMonth = endDate.getUTCMonth() + 1;
+
+    return (
+            startYear < currentYear ||
+            (startYear === currentYear && startMonth <= currentMonth)
+           ) && (
+            endYear > currentYear ||
+            (endYear === currentYear && endMonth >= currentMonth)
+           );
   }
 
   function isDayPartOfHolidays(day, startDate, endDate) {
@@ -147,5 +155,6 @@
   exports.guessTypeFromComment = guessTypeFromComment;
   exports.monthWeekTable = monthWeekTable;
   exports.updateWeeksWithHolidays = updateWeeksWithHolidays;
+  exports.isInCurrentMonth = isInCurrentMonth;
 
 })(typeof window === "object" ? window : exports);
