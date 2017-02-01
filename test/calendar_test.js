@@ -31,10 +31,10 @@ describe("Calendar", () => {
         // ensure every day of each week has a null type whenever the day is not
         // part of the target month
         days.forEach(day => {
-          if (day.date.getUTCMonth() !== 0) {
-            expect(day.type).to.be.a("null");
-          } else if (day.date.getUTCDay() === 0) {
+          if ([0, 6].includes(day.date.getUTCDay())) {
             expect(day.type).eql("WE");
+          } else if (day.date.getUTCMonth() !== 0) {
+            expect(day.type).to.be.null;
           } else {
             expect(day.type).to.be.a("string");
           }
@@ -153,10 +153,10 @@ describe("Calendar", () => {
       state = {
         weeks: Calendar.monthWeekTable(2017, 1),
         holidays: [{
-          start: "2017-01-02T00:00:00.000Z",
+          start: "2016-12-26T00:00:00.000Z",
           end: "2017-01-08T00:00:00.000Z",
           comment: 'RTT',
-          hours: 32
+          hours: 80
         }],
         currentMonth: 1,
         currentYear: 2017
@@ -181,11 +181,11 @@ describe("Calendar", () => {
            'type': 'JRTT'
           },
           {'date': utcDate(2017, 1, 5),
-           'hours': 4,
+           'hours': 8,
            'type': 'JRTT'
           },
           {'date': utcDate(2017, 1, 6),
-           'hours': 4,
+           'hours': 8,
            'type': 'JRTT'
           },
           {'date': utcDate(2017, 1, 7),
@@ -285,4 +285,148 @@ describe("Calendar", () => {
         ]);
     });
   });
+
+  describe('#isInCurrentMonth', function() {
+    it('should handle holidays contained entirely in a month', function() {
+      const startDate = new Date('2017-02-01T00:00:00Z');
+      const endDate = new Date('2017-02-03T00:00:00Z');
+      const trueStates = [{ currentMonth: 2, currentYear: 2017 }];
+      const falseStates = [
+        { currentMonth: 3, currentYear: 2017 },
+        { currentMonth: 1, currentYear: 2017 },
+        { currentMonth: 2, currentYear: 2016 },
+        { currentMonth: 12, currentYear: 2016 },
+      ];
+
+      trueStates.forEach(state => {
+        const fixture = Calendar.isInCurrentMonth(startDate, endDate, state);
+        expect(fixture).true;
+      });
+
+      falseStates.forEach(state => {
+        const fixture = Calendar.isInCurrentMonth(startDate, endDate, state);
+        expect(fixture).false;
+      });
+    });
+
+    it('should handle holidays that is between 2 months', function() {
+      const startDate = new Date('2017-01-25T00:00:00Z');
+      const endDate = new Date('2017-02-03T00:00:00Z');
+      const trueStates = [
+        { currentMonth: 2, currentYear: 2017 },
+        { currentMonth: 1, currentYear: 2017 },
+      ];
+      const falseStates = [
+        { currentMonth: 3, currentYear: 2017 },
+        { currentMonth: 2, currentYear: 2016 },
+        { currentMonth: 1, currentYear: 2016 },
+        { currentMonth: 2, currentYear: 2018 },
+        { currentMonth: 1, currentYear: 2018 },
+        { currentMonth: 12, currentYear: 2016 },
+      ];
+
+      trueStates.forEach(state => {
+        const fixture = Calendar.isInCurrentMonth(startDate, endDate, state);
+        expect(fixture).true;
+      });
+
+      falseStates.forEach(state => {
+        const fixture = Calendar.isInCurrentMonth(startDate, endDate, state);
+        expect(fixture).false;
+      });
+    });
+
+    it('should handle holidays that is between 3 months', function() {
+      const startDate = new Date('2017-01-25T00:00:00Z');
+      const endDate = new Date('2017-03-03T00:00:00Z');
+
+      const trueStates = [
+        { currentMonth: 3, currentYear: 2017 },
+        { currentMonth: 2, currentYear: 2017 },
+        { currentMonth: 1, currentYear: 2017 },
+      ];
+      const falseStates = [
+        { currentMonth: 4, currentYear: 2017 },
+        { currentMonth: 12, currentYear: 2016 },
+        { currentMonth: 1, currentYear: 2016 },
+        { currentMonth: 2, currentYear: 2016 },
+        { currentMonth: 3, currentYear: 2016 },
+        { currentMonth: 1, currentYear: 2018 },
+        { currentMonth: 2, currentYear: 2018 },
+        { currentMonth: 3, currentYear: 2018 },
+      ];
+
+      trueStates.forEach(state => {
+        const fixture = Calendar.isInCurrentMonth(startDate, endDate, state);
+        expect(fixture).true;
+      });
+
+      falseStates.forEach(state => {
+        const fixture = Calendar.isInCurrentMonth(startDate, endDate, state);
+        expect(fixture).false;
+      });
+    });
+
+    it('should handle holidays that is between 2 years', function() {
+      const startDate = new Date('2016-12-26T00:00:00Z');
+      const endDate = new Date('2017-01-04T00:00:00Z');
+
+      const trueStates = [
+        { currentMonth: 1, currentYear: 2017 },
+        { currentMonth: 12, currentYear: 2016 },
+      ];
+      const falseStates = [
+        { currentMonth: 2, currentYear: 2017 },
+        { currentMonth: 11, currentYear: 2016 },
+        { currentMonth: 1, currentYear: 2016 },
+        { currentMonth: 1, currentYear: 2018 },
+        { currentMonth: 12, currentYear: 2017 },
+        { currentMonth: 12, currentYear: 2015 },
+      ];
+
+      trueStates.forEach(state => {
+        const fixture = Calendar.isInCurrentMonth(startDate, endDate, state);
+        expect(fixture).true;
+      });
+
+      falseStates.forEach(state => {
+        const fixture = Calendar.isInCurrentMonth(startDate, endDate, state);
+        expect(fixture).false;
+      });
+    });
+
+    it('should handle holidays between 2 years and 3 months', function() {
+      const startDate = new Date('2016-11-26T00:00:00Z');
+      const endDate = new Date('2017-02-04T00:00:00Z');
+
+      const trueStates = [
+        { currentMonth: 1, currentYear: 2017 },
+        { currentMonth: 2, currentYear: 2017 },
+        { currentMonth: 12, currentYear: 2016 },
+        { currentMonth: 11, currentYear: 2016 },
+      ];
+      const falseStates = [
+        { currentMonth: 3, currentYear: 2017 },
+        { currentMonth: 2, currentYear: 2016 },
+        { currentMonth: 1, currentYear: 2016 },
+        { currentMonth: 2, currentYear: 2018 },
+        { currentMonth: 1, currentYear: 2018 },
+        { currentMonth: 10, currentYear: 2016 },
+        { currentMonth: 11, currentYear: 2015 },
+        { currentMonth: 11, currentYear: 2017 },
+        { currentMonth: 12, currentYear: 2015 },
+        { currentMonth: 12, currentYear: 2017 },
+      ];
+
+      trueStates.forEach(state => {
+        const fixture = Calendar.isInCurrentMonth(startDate, endDate, state);
+        expect(fixture).true;
+      });
+
+      falseStates.forEach(state => {
+        const fixture = Calendar.isInCurrentMonth(startDate, endDate, state);
+        expect(fixture).false;
+      });
+    });
+  })
 });
