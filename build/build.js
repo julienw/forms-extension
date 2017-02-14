@@ -7,7 +7,7 @@ var cp = require('child_process');
 var NPM_PACKAGE = 'package.json';
 var ADDON_PACKAGE = 'src/package.json';
 var ADDON_SOURCES = 'src/';
-var OUTPUT_XPI = 'dist/forms-extension-latest.xpi'
+var OUTPUT_XPI = 'dist/forms-extension-latest.xpi';
 
 function readPackage(fileName) {
   var file_content = fs.readFileSync(fileName);
@@ -26,14 +26,12 @@ function incrementRelease(version, mode) {
   return semver.inc(version, mode, 'pre');
 }
 
-function git() {
-  var args = [].slice.call(arguments);
+function git(...args) {
   console.log('[git]', args.join(' '));
   cp.execFileSync('git', args, { stdio: 'inherit' });
 }
 
-function jpm() {
-  var args = [].slice.call(arguments);
+function jpm(...args) {
   console.log('[jpm]', args.join(' '));
   var result = cp.execFileSync(
     '../node_modules/.bin/jpm',
@@ -76,6 +74,9 @@ var operations = {
     console.log('Renaming %s to %s.', xpiName, OUTPUT_XPI);
     fs.rename(xpiName, OUTPUT_XPI);
   },
+  sign: function() {
+    const signResult = jpm('sign', '');
+  },
   help: function() { printHelp(); }
 };
 
@@ -98,7 +99,7 @@ function printHelp(error) {
 
 var operation = getOperation(process.argv);
 if (! (operation.operation in operations)) {
-  printHelp('Operation ' + operation.operation + ' not found.');
+  printHelp(`Operation '${operation.operation}' not found.`);
   process.exit(1);
   return;
 }
