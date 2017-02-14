@@ -10,5 +10,7 @@
   "main": "lib/main.js",
   "permissions": {
     "multiprocess": true
-  }
+  },
+  "updateURL": "https://people.mozilla.org/~jwajsberg/french_holiday_forms/update.xml",
+  "updateLink": "https://people-mozilla.org/~jwajsberg/french_holiday_forms/french_holiday_forms-latest.xpi"
 }

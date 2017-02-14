@@ -7,7 +7,8 @@ var cp = require('child_process');
 var NPM_PACKAGE = 'package.json';
 var ADDON_PACKAGE = 'src/package.json';
 var ADDON_SOURCES = 'src/';
-var OUTPUT_XPI = 'dist/forms-extension-latest.xpi'
+var OUTPUT_XPI = 'dist/forms-extension-latest.xpi';
+var OUTPUT_RDF = 'dist/update.xml';
 
 function readPackage(fileName) {
   var file_content = fs.readFileSync(fileName);
@@ -43,6 +44,10 @@ function jpm() {
   return result;
 }
 
+function findRdfName(jpmOutput) {
+  return jpmOutput.match(/[^ ]+\.rdf\b/)[0];
+}
+
 function findXpiName(jpmOutput) {
   return jpmOutput.match(/[^ ]+\.xpi\b/)[0];
 }
@@ -66,15 +71,18 @@ var operations = {
     console.log('Generating a new XPI...');
     operations.dist();
     console.log('Committing and tagging with git');
-    git('add', ADDON_PACKAGE, NPM_PACKAGE, OUTPUT_XPI);
+    git('add', ADDON_PACKAGE, NPM_PACKAGE, OUTPUT_XPI, OUTPUT_RDF);
     git('commit', '-m', 'v' + newVersion);
     git('tag', newVersion);
   },
   dist: function() {
     var xpiResult = jpm('xpi');
     var xpiName = findXpiName(xpiResult);
+    var rdfName = findRdfName(xpiResult);
     console.log('Renaming %s to %s.', xpiName, OUTPUT_XPI);
     fs.rename(xpiName, OUTPUT_XPI);
+    console.log('Renaming %s to %s.', rdfName, OUTPUT_RDF);
+    fs.rename(rdfName, OUTPUT_RDF);
   },
   help: function() { printHelp(); }
 };
