@@ -139,6 +139,16 @@ describe("Calendar", () => {
       expect(type).eql("CS");
     });
 
+    it("should return CS for a comment containing birthday.", () => {
+      var type = Calendar.guessTypeFromComment("birthday");
+      expect(type).eql("CS");
+    });
+
+    it("should return CS for a comment containing anniversaire.", () => {
+      var type = Calendar.guessTypeFromComment("anniversaire");
+      expect(type).eql("CS");
+    });
+
     it("should stop on the first word found..", () => {
       var type = Calendar.guessTypeFromComment("Some sickness days before my wedding.");
       expect(type).eql("M");
