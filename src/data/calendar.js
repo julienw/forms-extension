@@ -7,7 +7,8 @@
     var words = {'sick': 'M', 'malad': 'M', 'patho': 'M',
                  'wedding': 'CS', 'mariage': 'CS',
                  'maternité': 'CS', 'parental': 'CS', 'paternité': 'CS',
-                 'sans solde': 'CS'};
+                 'sans solde': 'CS',
+                 'birthday': 'CS', 'anniversaire': 'CS'};
     var type = KNOWN_TYPES.find(type => comment && comment.includes(type));
     if (type == 'RTT') type = 'JRTT';
     Object.keys(words).some(word => {
