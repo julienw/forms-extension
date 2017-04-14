@@ -80,9 +80,9 @@ var operations = {
     var xpiName = findXpiName(xpiResult);
     var rdfName = findRdfName(xpiResult);
     console.log('Renaming %s to %s.', xpiName, OUTPUT_XPI);
-    fs.rename(xpiName, OUTPUT_XPI);
+    fs.renameSync(xpiName, OUTPUT_XPI);
     console.log('Renaming %s to %s.', rdfName, OUTPUT_RDF);
-    fs.rename(rdfName, OUTPUT_RDF);
+    fs.renameSync(rdfName, OUTPUT_RDF);
   },
   help: function() { printHelp(); }
 };
