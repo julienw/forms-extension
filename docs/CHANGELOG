@@ -1,0 +1,24 @@
+1.3.0 - April 14, 2017
+----------------------
+* Birthdays are now recognized as CS (Remy Hubscher)
+
+1.2.4 - February 14, 2017
+-------------------------
+* Handle auto-updates
+
+1.2.3 - February 14, 2017
+-------------------------
+* Mark the extension as e10s-compatible.
+
+1.2.2
+-----
+* Fix an issue with holidays that are across a year boundary.
+
+1.2.1 - Somewhere in January 2017
+---------------------------------
+* First public version to generate the form for autonomous employees.
+  Major contributors: Remy Hubscher and Nicolas Perriault
+
+1.0.0
+-----
+* Last version supporting the form for semi-autonomous employees.
