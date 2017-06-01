@@ -1,0 +1,6 @@
+collections:
+defaults:
+  - scope:
+      path: "assets"
+    values:
+      github: true
