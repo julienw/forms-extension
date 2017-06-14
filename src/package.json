@@ -11,5 +11,6 @@
   "permissions": {
     "multiprocess": true
   },
-  "updateURL": "https://julienw.github.io/forms-extension/update.xml"
+  "updateURL": "https://julienw.github.io/forms-extension/update.xml",
+  "updateLink": "https://julienw.github.io/forms-extension/french_holiday_forms-latest.xpi"
 }
