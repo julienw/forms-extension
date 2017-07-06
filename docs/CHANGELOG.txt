@@ -1,3 +1,11 @@
+1.3.3 - July 06, 2017
+---------------------
+* Add instructions about the documents to send for CS holidays
+
+1.3.2 - July 06, 2017
+---------------------
+* Please ignore
+
 1.3.1 - June 14, 2017
 ---------------------
 * Change the update URL to github.
