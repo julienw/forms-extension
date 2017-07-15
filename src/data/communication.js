@@ -1,10 +1,10 @@
 /*jshint esnext: true */
 /* global cloneInto */
 
-self.port.on(
-  'show', (holidays) => {
+browser.runtime.onMessage.addListener(
+  holidays => {
     var event = new CustomEvent('show-holidays', {
-      detail: cloneInto(holidays, document.defaultView),
+      detail: holidays,
       bubbles: true
     });
     document.documentElement.dispatchEvent(event);

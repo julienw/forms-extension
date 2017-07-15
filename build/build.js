@@ -33,11 +33,10 @@ function git() {
   cp.execFileSync('git', args, { stdio: 'inherit' });
 }
 
-function jpm() {
-  var args = [].slice.call(arguments);
-  console.log('[jpm]', args.join(' '));
+function webext(...args) {
+  console.log('[web-ext]', args.join(' '));
   var result = cp.execFileSync(
-    '../node_modules/.bin/jpm',
+    '../node_modules/.bin/web-ext',
     args, { cwd: ADDON_SOURCES }
   ).toString();
 
@@ -76,7 +75,7 @@ var operations = {
     git('tag', newVersion);
   },
   dist: function() {
-    var xpiResult = jpm('xpi');
+    var xpiResult = webext('build', '-v');
     var xpiName = findXpiName(xpiResult);
     var rdfName = findRdfName(xpiResult);
     console.log('Renaming %s to %s.', xpiName, OUTPUT_XPI);

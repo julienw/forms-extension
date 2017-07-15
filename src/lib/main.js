@@ -1,22 +1,18 @@
-/*jshint esnext:true */
-
-var XMLHttpRequest = require('sdk/net/xhr').XMLHttpRequest;
-var ActionButton = require('sdk/ui/button/action').ActionButton;
-var tabs = require('sdk/tabs');
+const { browserAction, tabs } = browser;
 
 var ptoWebsiteUrl = 'https://pto.mozilla.org/mypto.php';
 
 function init() {
-  ActionButton({
-    id: 'forms-extension',
-    label: 'generate forms',
-    icon: './icon-opt.svg',
-    onClick: generate
-  });
+  browserAction.onClicked.addListener(generate);
 }
 
-function generate() {
-  getAllHolidays(ptoWebsiteUrl).then(showResults);
+async function generate() {
+  try {
+    const holidays = await getAllHolidays(ptoWebsiteUrl);
+    await showResults(holidays);
+  } catch(e) {
+    console.error('Error while handling holidays', e);
+  }
 }
 
 /**
@@ -81,33 +77,46 @@ function getAllHolidays(url) {
  *
  * @returns Promise
  */
-function authenticate(url) {
-  return new Promise((resolve, reject) => {
-    tabs.open({
-      url,
-      inBackground: true,
-      onReady: function(tab) {
-        if (tab.title.startsWith('401')) {
-          reject(new Error('User canceled authentication'));
-        } else {
-          resolve();
-        }
-        tab.close();
+async function authenticate(url) {
+  const tab = await tabs.create({
+    url,
+    active: false,
+  });
+
+  // Note: tab.status is invalid right now, we need to wait for a first
+  // onUpdated callback to get it right.
+  // See https://bugzilla.mozilla.org/show_bug.cgi?id=1381756
+
+  const title = await new Promise(resolve => {
+    tabs.onUpdated.addListener(function listener(id, _, updatedTab) {
+      if (id !== tab.id) {
+        return;
+      }
+
+      // TODO We can't easily know when the tab is at the "interactive" state as
+      // we used to know with the old SDK APIs. Maybe we should execute a script
+      // to know this.
+      // https://bugzilla.mozilla.org/show_bug.cgi?id=1381754
+      if (updatedTab.status === 'complete') {
+        resolve(updatedTab.title || null);
+        tabs.onUpdated.removeListener(listener);
       }
     });
   });
+
+  await tabs.remove(tab.id);
+
+  if (title.startsWith('401')) {
+    throw new Error('User canceled authentication');
+  }
 }
 
-function showResults(holidays) {
-  tabs.open({
-    url: './results.html',
-    onLoad: function(tab) {
-      var worker = tab.attach({
-        contentScriptFile: ['./communication.js']
-      });
-      worker.port.emit('show', holidays);
-    }
+async function showResults(holidays) {
+  const tab = await tabs.create({
+    url: '/data/results.html',
   });
+  await tabs.executeScript(tab.id, { file: '/data/communication.js' });
+  await tabs.sendMessage(tab.id, holidays);
 }
 
 init();
