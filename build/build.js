@@ -151,7 +151,10 @@ var operations = {
     const forceOverwrite = strForce === 'force';
     this._readManifest();
 
-    var buildResult = webext('build', '--overwrite-dest');
+    const tmp = require('tmp');
+    tmp.setGracefulCleanup();
+    const tempDir = tmp.dirSync({ unsafeCleanup: true, prefix: 'forms-extension-build-' });
+    var buildResult = webext('build', '--overwrite-dest', '-a', tempDir.name);
     var xpiName = findPackageFileName(buildResult);
     const outputFile = OUTPUT_FILE(this._manifest.version);
     if (fs.existsSync(outputFile) && !forceOverwrite) {
