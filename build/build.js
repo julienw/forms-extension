@@ -4,15 +4,17 @@ var semver = require('semver');
 var fs = require('fs');
 var cp = require('child_process');
 
+const BASE_URL = 'https://julienw.github.io/forms-extension';
 const NPM_PACKAGE = 'package.json';
 const ADDON_MANIFEST = 'src/manifest.json';
 const ADDON_SOURCES = 'src/';
 const OUTPUT_DIR = 'docs';
-const OUTPUT_FILE = version => `${OUTPUT_DIR}/french_holiday_forms-${version}-fx.xpi`;
+const OUTPUT_FILENAME = version => `french_holiday_forms-${version}-fx.xpi`;
+const OUTPUT_FILE = version => `${OUTPUT_DIR}/${OUTPUT_FILENAME(version)}`;
 const PINNED_VERSIONS = {
   '1.3.3': {}, // could have a minGecko property
 };
-const UPDATE_FILE = `${OUTPUT_DIR}/updates.json`;
+const UPDATE_FILENAME = 'updates.json';
 const KNOWN_VERSION_MODES = [
   'major', 'premajor', 'minor', 'preminor', 'patch', 'prepatch', 'prerelease',
 ];
@@ -66,7 +68,7 @@ async function updatesFile({ addonId, latestVersion, latestMinGecko }) {
 
     return {
       version,
-      update_link: 'XXX',
+      update_link: `${BASE_URL}/${OUTPUT_FILENAME(version)}`,
       update_hash: hash,
       applications,
     };
@@ -79,7 +81,7 @@ async function updatesFile({ addonId, latestVersion, latestMinGecko }) {
   const hash = await computeHashForFile(OUTPUT_FILE(latestVersion));
   updates.push({
     version: latestVersion,
-    update_link: 'XXX',
+    update_link: `${BASE_URL}/${OUTPUT_FILENAME(latestVersion)}`,
     update_hash: hash,
     applications,
   });
@@ -131,6 +133,12 @@ var operations = {
     }
 
     this._manifest = readJSON(ADDON_MANIFEST);
+
+    // Sanity checks
+    const expectedUpdateUrl = `${BASE_URL}/${UPDATE_FILENAME}`;
+    if (this._manifest.updateUrl !== expectedUpdateUrl) {
+      throw new Error(`The update URL is '${this._manifest.updateUrl}' but we expected '${expectedUpdateUrl}'.`);
+    }
   },
 
   async version(options) {
@@ -188,8 +196,9 @@ var operations = {
       latestVersion: this._manifest.version,
       latestMinGecko: this._manifest.geckoMinVersion,
     });
-    console.log('Writing updates file', UPDATE_FILE);
-    fs.writeFileSync(UPDATE_FILE, JSON.stringify(content, null, 2));
+    const updateFile = `${OUTPUT_DIR}/${UPDATE_FILENAME}`;
+    console.log('Writing updates file', updateFile);
+    fs.writeFileSync(updateFile, JSON.stringify(content, null, 2));
   },
   async help() { printHelp(); }
 };
