@@ -13,6 +13,9 @@ const PINNED_VERSIONS = {
   '1.3.3': {}, // could have a minGecko property
 };
 const UPDATE_FILE = 'updates.json';
+const KNOWN_VERSION_MODES = [
+  'major', 'premajor', 'minor', 'preminor', 'patch', 'prepatch', 'prerelease',
+];
 
 function readJSON(fileName) {
   var file_content = fs.readFileSync(fileName);
@@ -42,7 +45,7 @@ async function computeHashForFile(filename) {
       if (data)
         hashCreator.update(data);
       else {
-        resolve(hash.digest('hex'));
+        resolve(hashCreator.digest('hex'));
       }
     });
     input.on('error', error => reject(error));
@@ -112,6 +115,15 @@ function findPackageFileName(buildOutput) {
   return buildOutput.match(/[^ ]+\.zip\b/)[0];
 }
 
+function findModeFromOptions(opts) {
+  const modes = KNOWN_VERSION_MODES.filter(mode => mode in opts);
+  if (modes.length > 1) {
+    printHelp(`Only one mode must be specified. Requested modes: ${modes.join(', ')}`);
+    process.exit(1);
+  }
+  return modes[0];
+}
+
 var operations = {
   _readManifest() {
     if (this._manifest) {
@@ -121,8 +133,8 @@ var operations = {
     this._manifest = readJSON(ADDON_MANIFEST);
   },
 
-  async version(mode) {
-    mode = mode || 'prerelease';
+  async version(options) {
+    const mode = findModeFromOptions(options) || 'prerelease';
     var package = readJSON(NPM_PACKAGE);
     var newVersion = incrementRelease(package.version, mode);
     console.log('Incrementing %s to %s (mode %s)', package.version, newVersion, mode);
@@ -137,9 +149,9 @@ var operations = {
     console.log('Written to %s', ADDON_MANIFEST);
 
     console.log('Generating a new package...');
-    operations.dist();
+    await operations.dist(options);
     console.log('Signing...');
-    operations.sign();
+    await operations.sign(options);
     console.log('Generating a new update file...');
     await operations.writeUpdates();
     console.log('Committing and tagging with git');
@@ -147,8 +159,8 @@ var operations = {
     git('commit', '-m', 'v' + newVersion);
     git('tag', newVersion);
   },
-  dist: function(strForce) {
-    const forceOverwrite = strForce === 'force';
+  async dist(options) {
+    const forceOverwrite = !!options.force;
     this._readManifest();
 
     const tmp = require('tmp');
@@ -159,13 +171,13 @@ var operations = {
     const outputFile = OUTPUT_FILE(this._manifest.version);
     if (fs.existsSync(outputFile) && !forceOverwrite) {
       console.error(`File '${outputFile}' already exists. Aborting...`);
-      console.error(`Use 'force' to overwrite.`);
+      console.error(`Use '--force' to overwrite.`);
       process.exit(1);
     }
     console.log('Renaming %s to %s.', xpiName, outputFile);
     fs.renameSync(xpiName, outputFile);
   },
-  sign() {
+  async sign() {
 
   },
   async writeUpdates() {
@@ -178,30 +190,37 @@ var operations = {
     console.log('Writing updates file', UPDATE_FILE);
     fs.writeFileSync(UPDATE_FILE, JSON.stringify(content, null, 2));
   },
-  help: function() { printHelp(); }
+  async help() { printHelp(); }
 };
-
-function getOperation(argv) {
-  return {
-    operation: argv[2],
-    argument: argv[3]
-  };
-}
 
 function printHelp(error) {
   if (error) {
     console.error(error);
   }
-  console.log('Usage: %s <operation> <arg>', process.argv[1]);
+  console.log('Usage: %s <operation> <optional arguments>', process.argv[1]);
   console.log('<operation> can be `version`, `dist` or `help`.');
-  console.log('Operation `version` takes a semver increment type: major, premajor, minor, preminor, patch, prepatch, or prerelease. See https://github.com/npm/node-semver#functions for more information.');
-  console.log('Operation `dist` takes an optional `force` argument to allow overwriting the output files.');
+  console.log(
+    'Operation `version` takes a semver increment type: %s. See https://github.com/npm/node-semver#functions for more information.',
+    `--${KNOWN_VERSION_MODES.join(', --')}`
+  );
+  console.log('Operation `dist` takes an optional `--force` argument to allow overwriting the output files.');
 }
 
-var operation = getOperation(process.argv);
-if (! (operation.operation in operations)) {
-  printHelp('Operation ' + operation.operation + ' not found.');
+const argv = require('minimist')(process.argv.slice(2));
+if (argv._.length !== 1) {
+  printHelp();
+  process.exit(1);
+}
+const operation = argv._.pop();
+
+if (! (operation in operations)) {
+  printHelp('Operation ' + operation + ' not found.');
   process.exit(1);
 }
 
-operations[operation.operation](operation.argument);
+operations[operation](argv).catch(
+  e => {
+    console.error(e);
+    process.exit(1);
+  }
+);
