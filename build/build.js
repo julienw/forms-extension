@@ -12,7 +12,7 @@ const OUTPUT_FILE = version => `${OUTPUT_DIR}/french_holiday_forms-${version}-fx
 const PINNED_VERSIONS = {
   '1.3.3': {}, // could have a minGecko property
 };
-const UPDATE_FILE = 'updates.json';
+const UPDATE_FILE = `${OUTPUT_DIR}/updates.json`;
 const KNOWN_VERSION_MODES = [
   'major', 'premajor', 'minor', 'preminor', 'patch', 'prepatch', 'prerelease',
 ];
@@ -54,7 +54,7 @@ async function computeHashForFile(filename) {
   return `${algorithm}:${hash}`;
 }
 async function updatesFile({ addonId, latestVersion, latestMinGecko }) {
-  const updates = await Object.keys(PINNED_VERSIONS).map(async version => {
+  const updates = await Promise.all(Object.keys(PINNED_VERSIONS).map(async version => {
     const { minGecko } = PINNED_VERSIONS[version];
 
     const applications = {};
@@ -70,7 +70,7 @@ async function updatesFile({ addonId, latestVersion, latestMinGecko }) {
       update_hash: hash,
       applications,
     };
-  });
+  }));
 
   const applications = {};
   if (latestMinGecko) {
@@ -148,11 +148,8 @@ var operations = {
     this._manifest.write();
     console.log('Written to %s', ADDON_MANIFEST);
 
-    console.log('Generating a new package...');
     await operations.dist(options);
-    console.log('Signing...');
     await operations.sign(options);
-    console.log('Generating a new update file...');
     await operations.writeUpdates();
     console.log('Committing and tagging with git');
     git('add', '.');
@@ -160,6 +157,8 @@ var operations = {
     git('tag', newVersion);
   },
   async dist(options) {
+    console.log('Generating a new package...');
+
     const forceOverwrite = !!options.force;
     this._readManifest();
 
@@ -178,9 +177,11 @@ var operations = {
     fs.renameSync(xpiName, outputFile);
   },
   async sign() {
+    console.log('Signing...');
 
   },
   async writeUpdates() {
+    console.log('Generating a new update file...');
     this._readManifest();
     const content = await updatesFile({
       addonId: this._manifest.addonId,
