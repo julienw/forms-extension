@@ -1,5 +1,4 @@
 /*jshint esnext: true */
-/* global cloneInto */
 
 browser.runtime.onMessage.addListener(
   holidays => {
