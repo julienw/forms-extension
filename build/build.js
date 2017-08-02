@@ -151,10 +151,10 @@ var operations = {
     const forceOverwrite = strForce === 'force';
     this._readManifest();
 
-    var buildResult = webext('build', '-v');
+    var buildResult = webext('build', '--overwrite-dest');
     var xpiName = findPackageFileName(buildResult);
     const outputFile = OUTPUT_FILE(this._manifest.version);
-    if (fs.existSync(outputFile) && !forceOverwrite) {
+    if (fs.existsSync(outputFile) && !forceOverwrite) {
       console.error(`File '${outputFile}' already exists. Aborting...`);
       console.error(`Use 'force' to overwrite.`);
       process.exit(1);
