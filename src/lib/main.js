@@ -20,29 +20,26 @@ async function generate() {
  *
  * @returns {Promise.<Document>}
  */
-function getDocumentAtUrl(url) {
-  return new Promise((resolve, reject) => {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url);
-    xhr.responseType = 'document';
-    xhr.withCredentials = true;
-    xhr.onload = function() {
-      if (isAuthenticationNeeded(xhr)) {
-        resolve(authenticate(url).then(() => getDocumentAtUrl(url)));
-        return;
-      }
-
-      resolve(xhr.responseXML);
-    };
-
-    xhr.onerror = () => reject(new Error('Network Error'));
-
-    xhr.send();
+async function getDocumentAtUrl(url) {
+  const response = await fetch(url, {
+    mode: 'same-origin',
+    credentials: 'same-origin',
+    redirect: 'manual',
   });
-}
 
-function isAuthenticationNeeded(xhr) {
-  return (xhr.status === 401);
+  if (response.ok) {
+    const page = await response.text();
+    const parser = new DOMParser();
+    return parser.parseFromString(page, 'text/html');
+  }
+
+  if (response.type === 'opaqueredirect') {
+    // Needs authentication
+    await authenticate(url);
+    return getDocumentAtUrl(url);
+  }
+
+  throw new Error('Unknown error while fetching PTOs');
 }
 
 /**
@@ -78,37 +75,39 @@ function getAllHolidays(url) {
  * @returns Promise
  */
 async function authenticate(url) {
-  const tab = await tabs.create({
-    url,
-    active: false,
-  });
+  const tab = await tabs.create({ url });
 
   // Note: tab.status is invalid right now, we need to wait for a first
   // onUpdated callback to get it right.
   // See https://bugzilla.mozilla.org/show_bug.cgi?id=1381756
 
-  const title = await new Promise(resolve => {
-    tabs.onUpdated.addListener(function listener(id, _, updatedTab) {
+  await new Promise((resolve, reject) => {
+    function removedListener(id) {
+      if (id !== tab.id) {
+        return;
+      }
+      tabs.onRemoved.removeListener(removedListener);
+      tabs.onUpdated.removeListener(updatedListener);
+      reject(new Error('User closed the authentication tab.'));
+    }
+
+    function updatedListener(id, _, updatedTab) {
       if (id !== tab.id) {
         return;
       }
 
-      // TODO We can't easily know when the tab is at the "interactive" state as
-      // we used to know with the old SDK APIs. Maybe we should execute a script
-      // to know this.
-      // https://bugzilla.mozilla.org/show_bug.cgi?id=1381754
-      if (updatedTab.status === 'complete') {
-        resolve(updatedTab.title || null);
-        tabs.onUpdated.removeListener(listener);
+      if (updatedTab.url === url) {
+        tabs.onRemoved.removeListener(removedListener);
+        tabs.onUpdated.removeListener(updatedListener);
+        resolve();
       }
-    });
+    }
+
+    tabs.onRemoved.addListener(removedListener);
+    tabs.onUpdated.addListener(updatedListener);
   });
 
   await tabs.remove(tab.id);
-
-  if (title.startsWith('401')) {
-    throw new Error('User canceled authentication');
-  }
 }
 
 async function showResults(holidays) {
