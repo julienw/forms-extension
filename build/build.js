@@ -155,6 +155,12 @@ function getIgnorePatterns() {
   });
 }
 
+// Web extensions do not support semver-like prerelease versions. Let's apply a
+// slight conversion.
+function semverToWebExtVersion(version) {
+  return version.replace(/-(\w+)\.(\d+)$/, '$1$2');
+}
+
 var operations = {
   _readManifest() {
     if (this._manifest) {
@@ -181,7 +187,7 @@ var operations = {
     package = null;
 
     this._readManifest();
-    this._manifest.version = newVersion;
+    this._manifest.version = semverToWebExtVersion(newVersion);
     this._manifest.write();
     console.log('Written to %s', ADDON_MANIFEST);
 
