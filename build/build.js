@@ -185,7 +185,7 @@ var operations = {
     fs.renameSync(xpiName, outputFile);
   },
   async sign() {
-    console.log('Signing...');
+    console.log('Not signing yet (WIP)...');
 
   },
   async writeUpdates() {
