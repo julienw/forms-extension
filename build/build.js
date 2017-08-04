@@ -3,7 +3,9 @@
 const semver = require('semver');
 const fs = require('fs');
 const cp = require('child_process');
+const { ncp } = require('ncp');
 const readline = require('readline');
+const { promisify } = require('util');
 
 const BASE_URL = 'https://julienw.github.io/forms-extension';
 const NPM_PACKAGE = 'package.json';
@@ -201,6 +203,7 @@ var operations = {
     await operations.dist(options);
     await operations.sign(options);
     await operations.writeUpdates();
+    await operations.copyLatest();
     console.log('Committing and tagging with git');
     console.log(git('add', '.'));
     console.log(git('commit', '-m', 'v' + newVersion));
@@ -244,7 +247,14 @@ var operations = {
     console.log('Writing updates file', updateFile);
     fs.writeFileSync(updateFile, JSON.stringify(content, null, 2));
   },
-  async help() { printHelp(); }
+  async help() { printHelp(); },
+  copyLatest() {
+    this._readManifest();
+    const input = OUTPUT_FILE(this._manifest.version);
+    const output = OUTPUT_FILE('latest');
+    console.log(`Copying ${input} to ${output}...`);
+    return promisify(ncp)(input, output, { stopOnErr: true });
+  }
 };
 
 function printHelp(error) {
