@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 
-var semver = require('semver');
-var fs = require('fs');
-var cp = require('child_process');
+const semver = require('semver');
+const fs = require('fs');
+const cp = require('child_process');
+const readline = require('readline');
 
 const BASE_URL = 'https://julienw.github.io/forms-extension';
 const NPM_PACKAGE = 'package.json';
 const ADDON_MANIFEST = 'src/manifest.json';
 const ADDON_SOURCES = 'src/';
+const IGNORE_FILE = 'src/.packageIgnore';
 const OUTPUT_DIR = 'docs';
 const OUTPUT_FILENAME = version => `french_holiday_forms-${version}-fx.xpi`;
 const OUTPUT_FILE = version => `${OUTPUT_DIR}/${OUTPUT_FILENAME(version)}`;
@@ -55,6 +57,7 @@ async function computeHashForFile(filename) {
 
   return `${algorithm}:${hash}`;
 }
+
 async function updatesFile({ addonId, latestVersion, latestMinGecko }) {
   const updates = await Promise.all(Object.keys(PINNED_VERSIONS).map(async version => {
     const { minGecko } = PINNED_VERSIONS[version];
@@ -126,6 +129,32 @@ function findModeFromOptions(opts) {
   return modes[0];
 }
 
+function getIgnorePatterns() {
+  const stream = fs.createReadStream(IGNORE_FILE);
+  const rl = readline.createInterface({
+    input: stream
+  });
+
+  const result = [];
+  return new Promise((resolve, reject) => {
+    rl.on('line', line => {
+      if (line) {
+        result.push(line);
+      }
+    });
+    rl.on('close', () => {
+      resolve(result);
+    });
+    stream.on('error', e => {
+      if (e.code === 'ENOENT') {
+        console.log(`Found no ignore file '${IGNORE_FILE}', ignoring nothing.`);
+        resolve([]);
+      }
+      reject(e);
+    });
+  });
+}
+
 var operations = {
   _readManifest() {
     if (this._manifest) {
@@ -173,7 +202,9 @@ var operations = {
     const tmp = require('tmp');
     tmp.setGracefulCleanup();
     const tempDir = tmp.dirSync({ unsafeCleanup: true, prefix: 'forms-extension-build-' });
-    var buildResult = webext('build', '--overwrite-dest', '-a', tempDir.name);
+    const ignorePatterns = await getIgnorePatterns();
+    const ignoreArguments = ignorePatterns.reduce((result, pattern) => [...result, '-i', pattern], []);
+    const buildResult = webext('build', '--overwrite-dest', '-a', tempDir.name, ...ignoreArguments);
     var xpiName = findPackageFileName(buildResult);
     const outputFile = OUTPUT_FILE(this._manifest.version);
     if (fs.existsSync(outputFile) && !forceOverwrite) {
