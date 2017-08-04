@@ -100,10 +100,9 @@ function incrementRelease(version, mode) {
   return semver.inc(version, mode, 'pre');
 }
 
-function git() {
-  var args = [].slice.call(arguments);
+function git(...args) {
   console.log('[git]', args.join(' '));
-  cp.execFileSync('git', args, { stdio: 'inherit' });
+  return cp.execFileSync('git', args).toString();
 }
 
 function webext(...args) {
@@ -161,6 +160,13 @@ function semverToWebExtVersion(version) {
   return version.replace(/-(\w+)\.(\d+)$/, '$1$2');
 }
 
+function checkWorkspaceClean() {
+  const status = git('status', '--porcelain');
+  if (status.length) {
+    throw new Error('Your workspace is not clean. Please commit or stash your changes.')
+  }
+}
+
 var operations = {
   _readManifest() {
     if (this._manifest) {
@@ -177,6 +183,7 @@ var operations = {
   },
 
   async version(options) {
+    checkWorkspaceClean();
     const mode = findModeFromOptions(options) || 'prerelease';
     var package = readJSON(NPM_PACKAGE);
     var newVersion = incrementRelease(package.version, mode);
@@ -195,9 +202,9 @@ var operations = {
     await operations.sign(options);
     await operations.writeUpdates();
     console.log('Committing and tagging with git');
-    git('add', '.');
-    git('commit', '-m', 'v' + newVersion);
-    git('tag', newVersion);
+    console.log(git('add', '.'));
+    console.log(git('commit', '-m', 'v' + newVersion));
+    console.log(git('tag', newVersion));
   },
   async dist(options) {
     console.log('Generating a new package...');
