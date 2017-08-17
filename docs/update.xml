@@ -11,8 +11,26 @@
                             <Description>
                               <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
                               <em:minVersion>38.0a1</em:minVersion>
-                              <em:maxVersion>*</em:maxVersion>
+                              <em:maxVersion>57.0a1</em:maxVersion>
                               <em:updateLink>https://julienw.github.io/forms-extension/french_holiday_forms-1.3.3-fx.xpi</em:updateLink>
+</Description>
+</em:targetApplication>
+
+
+                    </Description>
+
+                </li>
+                <li>
+                    <Description>
+                          <em:version>1.4.0</em:version>
+
+                          <em:targetApplication>
+                            <Description>
+                              <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                              <em:minVersion>56.0b3</em:minVersion>
+                              <em:maxVersion>*</em:maxVersion>
+                              <em:updateLink>https://julienw.github.io/forms-extension/french_holiday_forms-1.4.0-fx.xpi</em:updateLink>
+                              <em:updateHash>sha512:048d82e985ad13244cc679b1ce053b7d3fa5799b3daf5911b4be6947c8a362a23ab6ae147da95cd341071629a8c68663ec6c618622f19140008122124873bb27</em:updateHash>
 </Description>
 </em:targetApplication>
 
