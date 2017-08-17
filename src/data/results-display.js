@@ -32,11 +32,19 @@
   initCommunication();
   initFakeData();
 
+  // buttons interaction
+  initButtonHandlers();
+
   generatePTOForm();
 
   function initCommunication() {
     // Get back the PTO holidays from the PTO tool.
     window.addEventListener('show-holidays', (e) => loadPTOData(e.detail));
+  }
+
+  function initButtonHandlers() {
+    document.querySelector('#monthDown').addEventListener('click', changeMonthDown);
+    document.querySelector('#monthUp').addEventListener('click', changeMonthUp);
   }
 
   function initFakeData() {
@@ -147,7 +155,8 @@
             className: '',
             type: '',
             weekId: week_id,
-            dayId: day_id
+            dayId: day_id,
+            classError: ''
           };
           interpolateData.cells += templates.ptoCell.interpolate(cellData);
         } else {
@@ -187,8 +196,5 @@
     restoreSavedValues();
   }
 
-  exports.changeMonthUp = changeMonthUp;
-  exports.changeMonthDown = changeMonthDown;
   exports.updateModel = updateModel;
-
 })(window);

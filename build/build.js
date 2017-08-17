@@ -1,25 +1,100 @@
 #!/usr/bin/env node
 
-var semver = require('semver');
-var fs = require('fs');
-var cp = require('child_process');
+const semver = require('semver');
+const fs = require('fs');
+const cp = require('child_process');
+const { ncp } = require('ncp');
+const readline = require('readline');
+const { promisify } = require('util');
 
-var NPM_PACKAGE = 'package.json';
-var ADDON_PACKAGE = 'src/package.json';
-var ADDON_SOURCES = 'src/';
-var OUTPUT_XPI = 'dist/forms-extension-latest.xpi';
-var OUTPUT_RDF = 'dist/update.xml';
+const BASE_URL = 'https://julienw.github.io/forms-extension';
+const NPM_PACKAGE = 'package.json';
+const ADDON_MANIFEST = 'src/manifest.json';
+const ADDON_SOURCES = 'src/';
+const IGNORE_FILE = 'src/.packageIgnore';
+const OUTPUT_DIR = 'docs';
+const OUTPUT_FILENAME = version => `french_holiday_forms-${version}-fx.xpi`;
+const OUTPUT_FILE = version => `${OUTPUT_DIR}/${OUTPUT_FILENAME(version)}`;
+const PINNED_VERSIONS = {
+  '1.3.3': {}, // could have a minGecko property
+};
+const UPDATE_FILENAME = 'updates.json';
+const KNOWN_VERSION_MODES = [
+  'major', 'premajor', 'minor', 'preminor', 'patch', 'prepatch', 'prerelease',
+];
 
-function readPackage(fileName) {
+function readJSON(fileName) {
   var file_content = fs.readFileSync(fileName);
   var content = JSON.parse(file_content);
 
   return {
     get version() { return content.version; },
     set version(version) { content.version = version; },
+    get addonId() { return content.applications.gecko.id; },
+    get geckoMinVersion() { return content.applications.gecko.strict_min_version; },
+    get updateUrl() { return content.applications.gecko.update_url; },
     write: function() {
       fs.writeFileSync(fileName, JSON.stringify(content, null, 2));
     }
+  };
+}
+
+async function computeHashForFile(filename) {
+  const crypto = require('crypto');
+  const algorithm = 'sha512';
+
+  const hash = await new Promise((resolve, reject) => {
+    const hashCreator = crypto.createHash(algorithm);
+    const input = fs.createReadStream(filename);
+    input.on('readable', () => {
+      const data = input.read();
+      if (data)
+        hashCreator.update(data);
+      else {
+        resolve(hashCreator.digest('hex'));
+      }
+    });
+    input.on('error', error => reject(error));
+  });
+
+  return `${algorithm}:${hash}`;
+}
+
+async function updatesFile({ addonId, latestVersion, latestMinGecko }) {
+  const updates = await Promise.all(Object.keys(PINNED_VERSIONS).map(async version => {
+    const { minGecko } = PINNED_VERSIONS[version];
+
+    const applications = {};
+    if (minGecko) {
+      applications.gecko = { strict_min_version: minGecko };
+    }
+
+    const hash = await computeHashForFile(OUTPUT_FILE(version));
+
+    return {
+      version,
+      update_link: `${BASE_URL}/${OUTPUT_FILENAME(version)}`,
+      update_hash: hash,
+      applications,
+    };
+  }));
+
+  const applications = {};
+  if (latestMinGecko) {
+    applications.gecko = { strict_min_version: latestMinGecko };
+  }
+  const hash = await computeHashForFile(OUTPUT_FILE(latestVersion));
+  updates.push({
+    version: latestVersion,
+    update_link: `${BASE_URL}/${OUTPUT_FILENAME(latestVersion)}`,
+    update_hash: hash,
+    applications,
+  });
+
+  return {
+    addons: {
+      [addonId]: { updates }
+    },
   };
 }
 
@@ -27,35 +102,92 @@ function incrementRelease(version, mode) {
   return semver.inc(version, mode, 'pre');
 }
 
-function git() {
-  var args = [].slice.call(arguments);
+function git(...args) {
   console.log('[git]', args.join(' '));
-  cp.execFileSync('git', args, { stdio: 'inherit' });
+  return cp.execFileSync('git', args).toString();
 }
 
-function jpm() {
-  var args = [].slice.call(arguments);
-  console.log('[jpm]', args.join(' '));
+function webext(...args) {
+  console.log('[web-ext]', args.join(' '));
   var result = cp.execFileSync(
-    '../node_modules/.bin/jpm',
+    '../node_modules/.bin/web-ext',
     args, { cwd: ADDON_SOURCES }
   ).toString();
 
   return result;
 }
 
-function findRdfName(jpmOutput) {
-  return jpmOutput.match(/[^ ]+\.rdf\b/)[0];
+function findPackageFileName(buildOutput) {
+  return buildOutput.match(/[^ ]+\.zip\b/)[0];
 }
 
-function findXpiName(jpmOutput) {
-  return jpmOutput.match(/[^ ]+\.xpi\b/)[0];
+function findModeFromOptions(opts) {
+  const modes = KNOWN_VERSION_MODES.filter(mode => mode in opts);
+  if (modes.length > 1) {
+    printHelp(`Only one mode must be specified. Requested modes: ${modes.join(', ')}`);
+    process.exit(1);
+  }
+  return modes[0];
+}
+
+function getIgnorePatterns() {
+  const stream = fs.createReadStream(IGNORE_FILE);
+  const rl = readline.createInterface({
+    input: stream
+  });
+
+  const result = [];
+  return new Promise((resolve, reject) => {
+    rl.on('line', line => {
+      if (line) {
+        result.push(line);
+      }
+    });
+    rl.on('close', () => {
+      resolve(result);
+    });
+    stream.on('error', e => {
+      if (e.code === 'ENOENT') {
+        console.log(`Found no ignore file '${IGNORE_FILE}', ignoring nothing.`);
+        resolve([]);
+      }
+      reject(e);
+    });
+  });
+}
+
+// Web extensions do not support semver-like prerelease versions. Let's apply a
+// slight conversion.
+function semverToWebExtVersion(version) {
+  return version.replace(/-(\w+)\.(\d+)$/, '$1$2');
+}
+
+function checkWorkspaceClean() {
+  const status = git('status', '--porcelain');
+  if (status.length) {
+    throw new Error('Your workspace is not clean. Please commit or stash your changes.')
+  }
 }
 
 var operations = {
-  version: function(mode) {
-    mode = mode || 'prerelease';
-    var package = readPackage(NPM_PACKAGE);
+  _readManifest() {
+    if (this._manifest) {
+      return;
+    }
+
+    this._manifest = readJSON(ADDON_MANIFEST);
+
+    // Sanity checks
+    const expectedUpdateUrl = `${BASE_URL}/${UPDATE_FILENAME}`;
+    if (this._manifest.updateUrl !== expectedUpdateUrl) {
+      throw new Error(`The update URL is '${this._manifest.updateUrl}' but we expected '${expectedUpdateUrl}'.`);
+    }
+  },
+
+  async version(options) {
+    checkWorkspaceClean();
+    const mode = findModeFromOptions(options) || 'prerelease';
+    var package = readJSON(NPM_PACKAGE);
     var newVersion = incrementRelease(package.version, mode);
     console.log('Incrementing %s to %s (mode %s)', package.version, newVersion, mode);
     package.version = newVersion;
@@ -63,52 +195,96 @@ var operations = {
     console.log('Written to %s', NPM_PACKAGE);
     package = null;
 
-    var addonPackage = readPackage(ADDON_PACKAGE);
-    addonPackage.version = newVersion;
-    addonPackage.write();
-    console.log('Written to %s', ADDON_PACKAGE);
-    addonPackage = null;
-    console.log('Generating a new XPI...');
-    operations.dist();
-    console.log('Committing and tagging with git');
-    git('add', ADDON_PACKAGE, NPM_PACKAGE, OUTPUT_XPI, OUTPUT_RDF);
-    git('commit', '-m', 'v' + newVersion);
-    git('tag', newVersion);
-  },
-  dist: function() {
-    var xpiResult = jpm('xpi');
-    var xpiName = findXpiName(xpiResult);
-    var rdfName = findRdfName(xpiResult);
-    console.log('Renaming %s to %s.', xpiName, OUTPUT_XPI);
-    fs.renameSync(xpiName, OUTPUT_XPI);
-    console.log('Renaming %s to %s.', rdfName, OUTPUT_RDF);
-    fs.renameSync(rdfName, OUTPUT_RDF);
-  },
-  help: function() { printHelp(); }
-};
+    this._readManifest();
+    this._manifest.version = semverToWebExtVersion(newVersion);
+    this._manifest.write();
+    console.log('Written to %s', ADDON_MANIFEST);
 
-function getOperation(argv) {
-  return {
-    operation: argv[2],
-    argument: argv[3]
-  };
-}
+    await operations.dist(options);
+    await operations.sign(options);
+    await operations.writeUpdates();
+    await operations.copyLatest();
+    console.log('Committing and tagging with git');
+    console.log(git('add', '.'));
+    console.log(git('commit', '-m', 'v' + newVersion));
+    console.log(git('tag', newVersion));
+  },
+  async dist(options) {
+    console.log('Generating a new package...');
+
+    const forceOverwrite = !!options.force;
+    this._readManifest();
+
+    const tmp = require('tmp');
+    tmp.setGracefulCleanup();
+    const tempDir = tmp.dirSync({ unsafeCleanup: true, prefix: 'forms-extension-build-' });
+    const ignorePatterns = await getIgnorePatterns();
+    const ignoreArguments = ignorePatterns.reduce((result, pattern) => [...result, '-i', pattern], []);
+    const buildResult = webext('build', '--overwrite-dest', '-a', tempDir.name, ...ignoreArguments);
+    var xpiName = findPackageFileName(buildResult);
+    const outputFile = OUTPUT_FILE(this._manifest.version);
+    if (fs.existsSync(outputFile) && !forceOverwrite) {
+      console.error(`File '${outputFile}' already exists. Aborting...`);
+      console.error(`Use '--force' to overwrite.`);
+      process.exit(1);
+    }
+    console.log('Renaming %s to %s.', xpiName, outputFile);
+    fs.renameSync(xpiName, outputFile);
+  },
+  async sign() {
+    console.log('Not signing yet (WIP)...');
+
+  },
+  async writeUpdates() {
+    console.log('Generating a new update file...');
+    this._readManifest();
+    const content = await updatesFile({
+      addonId: this._manifest.addonId,
+      latestVersion: this._manifest.version,
+      latestMinGecko: this._manifest.geckoMinVersion,
+    });
+    const updateFile = `${OUTPUT_DIR}/${UPDATE_FILENAME}`;
+    console.log('Writing updates file', updateFile);
+    fs.writeFileSync(updateFile, JSON.stringify(content, null, 2));
+  },
+  async help() { printHelp(); },
+  copyLatest() {
+    this._readManifest();
+    const input = OUTPUT_FILE(this._manifest.version);
+    const output = OUTPUT_FILE('latest');
+    console.log(`Copying ${input} to ${output}...`);
+    return promisify(ncp)(input, output, { stopOnErr: true });
+  }
+};
 
 function printHelp(error) {
   if (error) {
     console.error(error);
   }
-  console.log('Usage: %s <operation> <arg>', process.argv[1]);
+  console.log('Usage: %s <operation> <optional arguments>', process.argv[1]);
   console.log('<operation> can be `version`, `dist` or `help`.');
-  console.log('Operation `version` takes a semver increment type: major, premajor, minor, preminor, patch, prepatch, or prerelease. See https://github.com/npm/node-semver#functions for more information.');
-  console.log('Operation `dist` takes no argument.');
+  console.log(
+    'Operation `version` takes a semver increment type: %s. See https://github.com/npm/node-semver#functions for more information.',
+    `--${KNOWN_VERSION_MODES.join(', --')}`
+  );
+  console.log('Operation `dist` takes an optional `--force` argument to allow overwriting the output files.');
 }
 
-var operation = getOperation(process.argv);
-if (! (operation.operation in operations)) {
-  printHelp('Operation ' + operation.operation + ' not found.');
+const argv = require('minimist')(process.argv.slice(2));
+if (argv._.length !== 1) {
+  printHelp();
   process.exit(1);
-  return;
+}
+const operation = argv._.pop();
+
+if (! (operation in operations)) {
+  printHelp('Operation ' + operation + ' not found.');
+  process.exit(1);
 }
 
-operations[operation.operation](operation.argument);
+operations[operation](argv).catch(
+  e => {
+    console.error(e);
+    process.exit(1);
+  }
+);
