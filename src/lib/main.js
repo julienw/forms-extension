@@ -39,7 +39,7 @@ async function getDocumentAtUrl(url) {
     return getDocumentAtUrl(url);
   }
 
-  throw new Error('Unknown error while fetching PTOs, your Firefox config prevent the add-on from accessing the auth0 pto cookie, try resetting your `privacy.firstparty.isolate` setting, remove all existing auth0 and pto cookies and try again.');
+  throw new Error('Unknown error while fetching PTOs, your Firefox config may prevent the add-on from accessing the auth0 pto cookie, try resetting your `privacy.firstparty.isolate` setting in about:config and removing all existing auth0 and pto cookies before trying again.');
 }
 
 /**
