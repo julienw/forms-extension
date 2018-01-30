@@ -103,5 +103,14 @@ describe("French Bank Holidays", () => {
         {date: utcDate(2017, 11, 10), name: 'Armistice Day (observed)'},
       ]);
     });
+
+    it("should return all boxing days of 2018.", () => {
+      var holidays = getFrenchBankHolidays(2018);
+      var boxing = getBoxingDays(2018, holidays);
+      expect(boxing).eql([
+        {date: utcDate(2018, 7, 13), name: 'Bastille Day (observed)'},
+        {date: utcDate(2018, 11, 12), name: 'Armistice Day (observed)'},
+      ]);
+    });
   });
 });
