@@ -48,7 +48,7 @@
     var boxingDays = getBoxingDays(year, frenchBankHolidays)
         .map((holiday) => formatDateString(holiday.date));
 
-    if (year < 2017) boxingDays = [];
+    if (year !== 2017) boxingDays = [];  // Boxing days where tested only in 2017
 
     return weeks.map((week, weekIndex) => {
       return week.map((day, dayIndex) => {
