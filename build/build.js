@@ -3,9 +3,7 @@
 const semver = require('semver');
 const fs = require('fs');
 const cp = require('child_process');
-const { ncp } = require('ncp');
 const readline = require('readline');
-const { promisify } = require('util');
 
 const BASE_URL = 'https://julienw.github.io/forms-extension';
 const NPM_PACKAGE = 'package.json';
@@ -253,7 +251,7 @@ var operations = {
     const input = OUTPUT_FILE(this._manifest.version);
     const output = OUTPUT_FILE('latest');
     console.log(`Copying ${input} to ${output}...`);
-    return promisify(ncp)(input, output, { stopOnErr: true });
+    fs.copyFileSync(input, output);
   }
 };
 
