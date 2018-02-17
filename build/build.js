@@ -185,6 +185,7 @@ var operations = {
   },
 
   async version(options) {
+    console.log('>>> version <<<');
     checkWorkspaceClean();
     const mode = findModeFromOptions(options) || 'prerelease';
     var package = readJSON(NPM_PACKAGE);
@@ -211,6 +212,7 @@ var operations = {
     console.log(git('tag', newVersion));
   },
   async dist(options) {
+    console.log('>>> dist <<<');
     console.log('Generating a new package...');
 
     const forceOverwrite = !!options.force;
@@ -233,6 +235,7 @@ var operations = {
     fs.renameSync(xpiName, outputFile);
   },
   async sign() {
+    console.log('>>> sign <<<');
     this._readManifest();
     const outputFile = OUTPUT_FILE(this._manifest.version);
     const rl = readline.createInterface({
@@ -248,6 +251,7 @@ var operations = {
     rl.close();
   },
   async writeUpdates() {
+    console.log('>>> writeUpdates <<<');
     console.log('Generating a new update file...');
     this._readManifest();
     const content = await updatesFile({
@@ -261,10 +265,13 @@ var operations = {
   },
   async help() { printHelp(); },
   deleteLatest() {
+    console.log('>>> deleteLatest <<<');
+    console.log('Deleting `latest` generic file...');
     const output = OUTPUT_FILE('latest');
     fs.unlinkSync(output);
   },
   copyLatest() {
+    console.log('>>> copyLatest <<<');
     this._readManifest();
     const input = OUTPUT_FILE(this._manifest.version);
     const output = OUTPUT_FILE('latest');
