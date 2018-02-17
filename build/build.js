@@ -4,6 +4,8 @@ const semver = require('semver');
 const fs = require('fs');
 const cp = require('child_process');
 const readline = require('readline');
+const { promisify } = require('util');
+const { stripIndent } = require('common-tags');
 
 const BASE_URL = 'https://julienw.github.io/forms-extension';
 const NPM_PACKAGE = 'package.json';
@@ -198,6 +200,7 @@ var operations = {
     this._manifest.write();
     console.log('Written to %s', ADDON_MANIFEST);
 
+    await operations.deleteLatest();
     await operations.dist(options);
     await operations.sign(options);
     await operations.writeUpdates();
@@ -230,8 +233,19 @@ var operations = {
     fs.renameSync(xpiName, outputFile);
   },
   async sign() {
-    console.log('Not signing yet (WIP)...');
-
+    this._readManifest();
+    const outputFile = OUTPUT_FILE(this._manifest.version);
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+    await promisify(rl.question).call(rl, stripIndent`
+      Automatic signing isn't implemented yet.
+      Please sign the newly generated file ${outputFile} using AMO's website
+      and copy the result using the exact same name.
+      Press ENTER when you're ready...
+    `);
+    rl.close();
   },
   async writeUpdates() {
     console.log('Generating a new update file...');
@@ -246,6 +260,10 @@ var operations = {
     fs.writeFileSync(updateFile, JSON.stringify(content, null, 2));
   },
   async help() { printHelp(); },
+  deleteLatest() {
+    const output = OUTPUT_FILE('latest');
+    fs.unlinkSync(output);
+  },
   copyLatest() {
     this._readManifest();
     const input = OUTPUT_FILE(this._manifest.version);
