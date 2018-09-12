@@ -106,7 +106,9 @@
     if (type.startsWith("0.5") || type.startsWith("1/2") || type.startsWith("0,5")) {
       nbHours = 4;
     }
-    type = /[A-Z]+/.exec(type.toUpperCase())[0];
+    if (type) {
+      type = /[A-Z]+/.exec(type.toUpperCase())[0];
+    }
 
     const day = state.weeks[weekId][dayId];
     day.type = type;
