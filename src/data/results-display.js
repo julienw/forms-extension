@@ -107,7 +107,10 @@
       nbHours = 4;
     }
     if (type) {
-      type = /[A-Z]+/.exec(type.toUpperCase())[0];
+      const extractTypeResult = /[A-Z]+/.exec(type.toUpperCase());
+      if (extractTypeResult) {
+        type = extractTypeResult[0];
+      }
     }
 
     const day = state.weeks[weekId][dayId];
