@@ -10,3 +10,23 @@ You can pass an argument to generate a specific type of version.
 Ensure to enable printing background images to print the signature.
 
 ![](http://i.imgur.com/Bnnoh0Q.png)
+
+# Running locally
+
+To run the extension locally, start by installing the dependencies:
+
+```bash
+npm install
+```
+
+Then use `npm start` to run the extension in your browser. You can force the browser to use like so:
+
+```bash
+npm start -- -f /path/to/my/browser
+```
+
+Running tests is as simple as:
+
+```bash
+npm test
+```
