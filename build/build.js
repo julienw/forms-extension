@@ -169,6 +169,24 @@ function checkWorkspaceClean() {
   }
 }
 
+async function pauseWithMessage(message) {
+  if (message) {
+    message += '\n';
+  } else {
+    message = '';
+  }
+
+  message += 'Press ENTER when youʼre ready...';
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  await promisify(rl.question).call(rl, message);
+  rl.close();
+}
+
 var operations = {
   _readManifest() {
     if (this._manifest) {
@@ -190,7 +208,10 @@ var operations = {
     const mode = findModeFromOptions(options) || 'prerelease';
     var package = readJSON(NPM_PACKAGE);
     var newVersion = incrementRelease(package.version, mode);
-    console.log('Incrementing %s to %s (mode %s)', package.version, newVersion, mode);
+    await pauseWithMessage(stripIndent`
+      Incrementing ${package.version} to ${newVersion} (mode “${mode}”).
+      If this isn't what you expect, press CTRL-C now.
+    `);
     package.version = newVersion;
     package.write();
     console.log('Written to %s', NPM_PACKAGE);
@@ -211,6 +232,7 @@ var operations = {
     console.log(git('commit', '-m', 'v' + newVersion));
     console.log(git('tag', newVersion));
   },
+
   async dist(options) {
     console.log('>>> dist <<<');
     console.log('Generating a new package...');
@@ -234,22 +256,18 @@ var operations = {
     console.log('Renaming %s to %s.', xpiName, outputFile);
     fs.renameSync(xpiName, outputFile);
   },
+
   async sign() {
     console.log('>>> sign <<<');
     this._readManifest();
     const outputFile = OUTPUT_FILE(this._manifest.version);
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
-    await promisify(rl.question).call(rl, stripIndent`
+    await pauseWithMessage(stripIndent`
       Automatic signing isn't implemented yet.
       Please sign the newly generated file ${outputFile} using AMO's website
       and copy the result using the exact same name.
-      Press ENTER when you're ready...
     `);
-    rl.close();
   },
+
   async writeUpdates() {
     console.log('>>> writeUpdates <<<');
     console.log('Generating a new update file...');
@@ -263,13 +281,16 @@ var operations = {
     console.log('Writing updates file', updateFile);
     fs.writeFileSync(updateFile, JSON.stringify(content, null, 2));
   },
+
   async help() { printHelp(); },
+
   deleteLatest() {
     console.log('>>> deleteLatest <<<');
     console.log('Deleting `latest` generic file...');
     const output = OUTPUT_FILE('latest');
     fs.unlinkSync(output);
   },
+
   copyLatest() {
     console.log('>>> copyLatest <<<');
     this._readManifest();
@@ -295,13 +316,22 @@ function printHelp(error) {
 
 const argv = require('minimist')(process.argv.slice(2));
 if (argv._.length !== 1) {
+  // More than 1 operation was specified on the command line
   printHelp();
   process.exit(1);
 }
-const operation = argv._.pop();
+
+if (argv.help) {
+  // --help was used somewhere
+  printHelp();
+  process.exit(0);
+}
+
+const operation = argv._[0];
 
 if (! (operation in operations)) {
-  printHelp('Operation ' + operation + ' not found.');
+  // The specified operation is unknown
+  printHelp(`Operation “${operation}” is unknown.`);
   process.exit(1);
 }
 
