@@ -10,7 +10,7 @@ attachInputHandler();
 attachEmptyCellHandler();
 
 function attachInputHandler() {
-  table.addEventListener('input', Utils.throttle((e) => onThrottledInput(e, updateModel), 2000));
+  table.addEventListener('input', Utils.throttle((e) => onThrottledInput(e, updateModel), 800));
 }
 
 function attachEmptyCellHandler() {

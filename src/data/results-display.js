@@ -10,13 +10,16 @@
     ptoSummary: new Template('form-summary-template')
   };
 
-  var WORKING_DAY_TYPES = ['JT', 'CP', 'JRTT', 'M', 'CS'];
+  // '-' is a type used for part-time employees to indicate non-working
+  // days, so that those days are still counted as "jours ouvrés".
+  var WORKING_DAY_TYPES = ['-', 'JT', 'CP', 'JRTT', 'M', 'CS'];
 
   var ptoTable = document.querySelector('.worked-days-table tbody');
   var ptoSummaryTable = document.querySelector('.summary');
 
   var DEFAULT_SUMMARY_VALUES = {
     totalWorkingDays: 0,
+    '-': 0,
     JT: 0,
     JF: 0,
     M: 0,
