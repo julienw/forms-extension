@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint src lib",
     "start": "cd src && web-ext run",
-    "test": "mocha"
+    "test": "mocha",
+    "build": "webextension-build-script"
   },
   "repository": {
     "type": "git",
@@ -23,12 +24,9 @@
   "homepage": "https://github.com/julienw/forms-extension#readme",
   "devDependencies": {
     "chai": "^3.5.0",
-    "common-tags": "^1.7.2",
     "eslint": "^4.2.0",
-    "minimist": "^1.2.0",
     "mocha": "^3.2.0",
-    "semver": "5.0.1",
-    "tmp": "0.0.31",
-    "web-ext": "^1.10.1"
+    "web-ext": "^1.10.1",
+    "webextension-build-script": "^0.1.1"
   }
 }

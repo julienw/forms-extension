@@ -1,9 +1,9 @@
 # Releasing
 
-Run `build/build.js version` to generate a new version (including git tagging).
+Run `yarn build version` to generate a new version (including git tagging).
 
 You can also pass an argument to generate a specific type of version, run
-`build/build.js help` to get more information.
+`yarn build help` to get more information.
 
 ## Tips
 
