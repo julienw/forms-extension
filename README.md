@@ -18,17 +18,17 @@ Ensure to enable printing background images to print the signature.
 To run the extension locally, start by installing the dependencies:
 
 ```bash
-npm install
+yarn install
 ```
 
-Then use `npm start` to run the extension in your browser. You can force the browser to use like so:
+Then use `yarn start` to run the extension in your browser. You can force the browser to use like so:
 
 ```bash
-npm start -- -f /path/to/my/browser
+yarn start -- -f /path/to/my/browser
 ```
 
 Running tests is as simple as:
 
 ```bash
-npm test
+yarn test
 ```
