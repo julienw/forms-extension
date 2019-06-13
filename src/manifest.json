@@ -17,6 +17,10 @@
     "default_title": "Generate forms",
     "browser_style": true
   },
+  "icons": {
+    "48": "data/icon-opt.svg",
+    "96": "data/icon-opt.svg"
+  },
   "background": {
     "scripts": [
       "lib/main.js"
