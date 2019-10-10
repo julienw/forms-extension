@@ -10,7 +10,7 @@ global.getBoxingDays = getBoxingDays;
 
 describe("Calendar", () => {
   describe("#monthWeekTable()", () => {
-    let weektable;
+    let weekTable;
 
     beforeEach(() => {
       weekTable = Calendar.monthWeekTable(2017, 1);
