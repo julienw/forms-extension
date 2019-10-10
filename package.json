@@ -23,10 +23,10 @@
   },
   "homepage": "https://github.com/julienw/forms-extension#readme",
   "devDependencies": {
-    "chai": "^3.5.0",
-    "eslint": "^4.2.0",
-    "mocha": "^3.2.0",
-    "web-ext": "^1.10.1",
+    "chai": "^4.2.0",
+    "eslint": "^6.5.1",
+    "mocha": "^6.2.1",
+    "web-ext": "^3.2.0",
     "webextension-build-script": "^0.1.1"
   }
 }
