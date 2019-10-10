@@ -76,7 +76,7 @@
 
   function loadPTOData(holidays) {
     state.holidays = holidays;
-    if (state.hasOwnProperty("weeks")) {
+    if (Object.prototype.hasOwnProperty.call(state, ("weeks"))) {
       state.weeks = updateWeeksWithHolidays(state);
       generatePTOForm();
     }

@@ -10,7 +10,7 @@ global.getBoxingDays = getBoxingDays;
 
 describe("Calendar", () => {
   describe("#monthWeekTable()", () => {
-    let weektable;
+    let weekTable;
 
     beforeEach(() => {
       weekTable = Calendar.monthWeekTable(2017, 1);
@@ -18,7 +18,7 @@ describe("Calendar", () => {
 
     it("should return a week array with the expected length", () => {
       expect(weekTable)
-        .to.have.length.of(6);
+        .to.have.length(6);
     });
 
     it("should return a week array with the expected weeks length", () => {

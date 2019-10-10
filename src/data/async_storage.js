@@ -1,4 +1,3 @@
-/* globals indexedDB */
 /**
  * This file defines an asynchronous version of the localStorage API, backed by
  * an IndexedDB database.  It creates a global asyncStorage object that has
