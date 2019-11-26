@@ -9,9 +9,9 @@
           "applications": {}
         },
         {
-          "version": "1.5.4",
-          "update_link": "https://julienw.github.io/forms-extension/french_holiday_forms-1.5.4-fx.xpi",
-          "update_hash": "sha512:91f32a4b971a94d1ab3563e5df4208f170c9a2c93fcd7cd3cce688cd470b47b7552a521c74019f4955aa8d279056457f0489b0d39199b2458f0c5517c3dedebd",
+          "version": "1.6.0",
+          "update_link": "https://julienw.github.io/forms-extension/french_holiday_forms-1.6.0-fx.xpi",
+          "update_hash": "sha512:0c9d32d5e3ee224a3900d36933f4d6d2b54ea334f98b29a5705271151aae1993644bc8a243d1fc87cd75c6292c42a40c3380ef6b476e81217170d3acf09bac24",
           "applications": {
             "gecko": {
               "strict_min_version": "56.0"
