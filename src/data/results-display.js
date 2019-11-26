@@ -12,6 +12,7 @@
 
   // '-' is a type used for part-time employees to indicate non-working
   // days, so that those days are still counted as "jours ouvrés".
+  // JF aren't part of the "working days".
   var WORKING_DAY_TYPES = ['-', 'JT', 'CP', 'JRTT', 'M', 'CS'];
 
   var ptoTable = document.querySelector('.worked-days-table tbody');
@@ -51,8 +52,9 @@
   }
 
   function initFakeData() {
-    if (window.location.protocol !== 'resource:') {
-      // We're not in the addon
+    if (window.location.protocol === 'file:') {
+      // We're loading the file directly, which means that we're in development.
+      // Let's load the fake data then!
       loadPTOData(fakeData);
     }
   }
@@ -154,10 +156,12 @@
       week.forEach((day, day_id) => {
         var cellData;
         if ([0, 6].includes(day.date.getUTCDay())) {
+          // We don't render week-ends.
           return;
         }
 
         if (!day.type) {
+          // This day isn't part of the month. We render a blank cell.
           cellData = {
             id: 'day-' + week_id + '_' + day_id,
             className: '',
@@ -168,6 +172,7 @@
           };
           interpolateData.cells += templates.ptoCell.interpolate(cellData);
         } else {
+          // This day is part of the month. We render a full cell.
           // Increment counters
           summary[day.type] += day.hours / 8;
           summary.JT += 1 - (day.hours / 8);

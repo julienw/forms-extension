@@ -51,15 +51,14 @@ function getAllHolidays(url) {
   return getDocumentAtUrl(url).then(document => {
     var lines = document.querySelectorAll('tbody > tr');
     var holidays = Array.from(lines).map((line) => {
-      var txtHours = parseInt(line.children[1].textContent, 10);
-      var txtStartDate = line.children[2].textContent;
-      var txtEndDate = line.children[3].textContent;
-      var txtComment = line.children[4].textContent;
+      var txtStartDate = line.children[1].textContent;
+      var txtEndDate = line.children[2].textContent;
+      var txtComment = line.children[3].textContent;
 
       var startDate = new Date(txtStartDate + ' UTC');
       var endDate = new Date(txtEndDate + ' UTC');
 
-      return { start: startDate, end: endDate, comment: txtComment, hours: txtHours };
+      return { start: startDate, end: endDate, comment: txtComment };
     });
 
     return holidays;
