@@ -51,8 +51,9 @@
   }
 
   function initFakeData() {
-    if (window.location.protocol !== 'resource:') {
-      // We're not in the addon
+    if (window.location.protocol === 'file:') {
+      // We're loading the file directly, which means that we're in development.
+      // Let's load the fake data then!
       loadPTOData(fakeData);
     }
   }
