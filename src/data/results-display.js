@@ -123,7 +123,7 @@
     day.hours = nbHours;
     day.error = !Object.keys(DEFAULT_SUMMARY_VALUES).includes(type);
 
-    generatePTOForm();
+    generatePTOForm({ includeTable: false });
   }
 
   function setSummary(currentMonthDate, options) {
@@ -134,8 +134,10 @@
     ptoSummaryTable.innerHTML = templates.ptoSummary.interpolate(interpolateSummaryData);
   }
 
-  function generatePTOForm() {
-    ptoTable.innerHTML = '';
+  function generatePTOForm({ includeTable } = { includeTable: true }) {
+    if (includeTable) {
+      ptoTable.innerHTML = '';
+    }
 
     var currentMonthDate = utcDate(state.currentYear, state.currentMonth, 1);
     var summary = Object.assign({}, DEFAULT_SUMMARY_VALUES);
@@ -192,14 +194,15 @@
         }
       });
 
-
-      /* Data is sanitized by the Template library. */
-      ptoTable.insertAdjacentHTML(
-        'beforeend',
-        templates.ptoRow.interpolate(
-          interpolateData, { safe: ['cells']}
-        )
-      );
+      if (includeTable) {
+        /* Data is sanitized by the Template library. */
+        ptoTable.insertAdjacentHTML(
+          'beforeend',
+          templates.ptoRow.interpolate(
+            interpolateData, { safe: ['cells']}
+          )
+        );
+      }
     });
 
     setSummary(currentMonthDate, summary);
