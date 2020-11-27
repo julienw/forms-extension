@@ -8,9 +8,11 @@ workflows:
   node-tests:
     jobs:
       - node/test:
+          name: Tests
           pkg-manager: yarn
           version: *node-version
       - node/test:
+          name: Lint
           pkg-manager: yarn
           run-command: lint
           version: *node-version
