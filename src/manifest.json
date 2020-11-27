@@ -3,7 +3,7 @@
   "name": "French Holiday Form Generator",
   "description": "Used by french employees to generate their holiday form",
   "author": "Julien Wajsberg",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "applications": {
     "gecko": {
       "id": "jid1-Ie0ShncwSkPKJg@jetpack",
