@@ -24,7 +24,7 @@ yarn install
 Then use `yarn start` to run the extension in your browser. You can force the browser to use like so:
 
 ```bash
-yarn start -- -f /path/to/my/browser
+yarn start -f /path/to/my/browser
 ```
 
 Running tests is as simple as:
