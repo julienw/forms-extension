@@ -1,3 +1,41 @@
+1.7.0 - Nov 27, 2020
+--------------------
+* Change how we collect the date to support containers and First-Party isolation
+* Update dependencies
+
+1.6.1 - Dec 9, 2019
+-------------------
+* Do not reset the table at each change, so that the focus isn't lost
+
+1.6.0 - Nov 26, 2019
+--------------------
+* Support latest changes in pto.mozilla.org
+
+1.5.4 - Oct 10, 2019
+--------------------
+* Nothing major, just update dependencies
+
+1.5.3 - Jun 13, 2019
+--------------------
+* Add an icon to the extension
+
+1.5.2 - Nov 19, 2018
+--------------------
+* Support a dash to indicate a non-worked day for part-time employees
+
+1.5.1 - Sep 19, 2018
+--------------------
+* Support empty cells for part-time employees
+
+1.5.0 - Feb 17, 2018
+--------------------
+* Do not use Boxing Days starting 2018
+* Give better feedback in case of cookie errors (in the console)
+
+1.4.0 - Aug 17, 2017
+--------------------
+* Convert to a Web Extension
+
 1.3.3 - July 06, 2017
 ---------------------
 * Add instructions about the documents to send for CS holidays
