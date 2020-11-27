@@ -2,78 +2,85 @@ const { browserAction, tabs } = browser;
 
 var ptoWebsiteUrl = 'https://pto.mozilla.org/mypto.php';
 
+/**
+ * This is the entry point for this extension: this registers the event handler
+ * for the button.
+ */
 function init() {
   browserAction.onClicked.addListener(generate);
 }
 
+/**
+ * This will orchestrate all necessary calls to display the final form in a tab.
+ *
+ * @returns {Promise<void>}
+ */
 async function generate() {
   try {
-    const holidays = await getAllHolidays(ptoWebsiteUrl);
+    const tab = await openTabAndAuthenticate(ptoWebsiteUrl);
+    const tableDocument = await extractPtoInformationFromTab(tab);
+
+    // Note to a future reader: I tried to reuse this tab to display the result,
+    // but this wasn't working at the first try (error "no receiving end" when
+    // sending the message) and didn't seem worth the effort to make it work as
+    // the current way works fine.
+    await tabs.remove(tab.id);
+
+    const holidays = await getAllHolidaysFromDocument(tableDocument);
     await showResults(holidays);
   } catch(e) {
-    console.error('Error while handling holidays', e);
+    console.error('Error while generating the holiday form', e);
   }
 }
 
 /**
- * Retrieve a document at this url, handling authentication in the process.
+ * Retrieve the PTO table from the tab.
  *
- * @returns {Promise.<Document>}
+ * @param {Tab} tab This is the tab where we'll get the string from.
+ * @returns {Promise<Document>}
  */
-async function getDocumentAtUrl(url) {
-  const response = await fetch(url, {
-    mode: 'same-origin',
-    credentials: 'same-origin',
-    redirect: 'manual',
+async function extractPtoInformationFromTab(tab) {
+  const tableHtmlString = await tabs.executeScript(
+    tab.id,
+    { code: "document.querySelector('table').outerHTML", runAt: "document_end" }
+  );
+  const parser = new DOMParser();
+  return parser.parseFromString(tableHtmlString, 'text/html');
+}
+
+/**
+ * Parses the document and extract a well-structured object containing the
+ * holiday information.
+ *
+ * @param {ParentNode} Document or element or fragment containing the PTO information we need.
+ * @returns {Promise<Array<{start, end, comment}>>}
+ */
+async function getAllHolidaysFromDocument(tableDocument) {
+  // By specifying tbody we avoid the header row.
+  var lines = tableDocument.querySelectorAll('tbody > tr');
+  var holidays = Array.from(lines).map((line) => {
+    var txtStartDate = line.children[1].textContent;
+    var txtEndDate = line.children[2].textContent;
+    var txtComment = line.children[3].textContent;
+
+    var startDate = new Date(txtStartDate + ' UTC');
+    var endDate = new Date(txtEndDate + ' UTC');
+
+    return { start: startDate, end: endDate, comment: txtComment };
   });
 
-  if (response.ok) {
-    const page = await response.text();
-    const parser = new DOMParser();
-    return parser.parseFromString(page, 'text/html');
-  }
-
-  if (response.type === 'opaqueredirect') {
-    // Needs authentication
-    await authenticate(url);
-    return getDocumentAtUrl(url);
-  }
-
-  throw new Error('Unknown error while fetching PTOs, your Firefox config may prevent the add-on from accessing the auth0 pto cookie, try resetting your `privacy.firstparty.isolate` setting in about:config and removing all existing auth0 and pto cookies before trying again.');
+  return holidays;
 }
 
 /**
- * Retrieve the mypto page and parses it to a JS object
+ * Opens a pto.mozilla.org page in a tab to trigger authentication. The promise
+ * is resolved when the url is finally loaded, after authentication is
+ * sucessful. It is rejected if the user closes the tab before authentication.
  *
- * @returns {Promise.<Array.<{start, end, comment}>>}
+ * @param {String} url
+ * @returns {Promise<Tab>}
  */
-function getAllHolidays(url) {
-  return getDocumentAtUrl(url).then(document => {
-    var lines = document.querySelectorAll('tbody > tr');
-    var holidays = Array.from(lines).map((line) => {
-      var txtStartDate = line.children[1].textContent;
-      var txtEndDate = line.children[2].textContent;
-      var txtComment = line.children[3].textContent;
-
-      var startDate = new Date(txtStartDate + ' UTC');
-      var endDate = new Date(txtEndDate + ' UTC');
-
-      return { start: startDate, end: endDate, comment: txtComment };
-    });
-
-    return holidays;
-  }).catch(e => {
-    console.error('got error while retrieving document:', e);
-    throw e;
-  });
-}
-
-/**
- * Opens a pto.mozilla.org page in a tab to trigger authentication.
- *
- * @returns Promise
- */
-async function authenticate(url) {
+async function openTabAndAuthenticate(url) {
   const tab = await tabs.create({ url });
 
   // Note: tab.status is invalid right now, we need to wait for a first
@@ -106,9 +113,15 @@ async function authenticate(url) {
     tabs.onUpdated.addListener(updatedListener);
   });
 
-  await tabs.remove(tab.id);
+  return tab;
 }
 
+/**
+ * This opens a new tab with the form and hands over the holiday data to it.
+ *
+ * @param {Array<{start, end, comment}} holidays
+ * @returns {Promise<void>}
+ */
 async function showResults(holidays) {
   const tab = await tabs.create({
     url: '/data/results.html',
