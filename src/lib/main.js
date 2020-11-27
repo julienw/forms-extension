@@ -21,25 +21,14 @@ async function generate() {
  * @returns {Promise.<Document>}
  */
 async function getDocumentAtUrl(url) {
-  const response = await fetch(url, {
-    mode: 'same-origin',
-    credentials: 'same-origin',
-    redirect: 'manual',
-  });
-
-  if (response.ok) {
-    const page = await response.text();
-    const parser = new DOMParser();
-    return parser.parseFromString(page, 'text/html');
-  }
-
-  if (response.type === 'opaqueredirect') {
-    // Needs authentication
-    await authenticate(url);
-    return getDocumentAtUrl(url);
-  }
-
-  throw new Error('Unknown error while fetching PTOs, your Firefox config may prevent the add-on from accessing the auth0 pto cookie, try resetting your `privacy.firstparty.isolate` setting in about:config and removing all existing auth0 and pto cookies before trying again.');
+  const tab = await openTabAndAuthenticate(url);
+  const tableHtmlString = await tabs.executeScript(
+    tab.id,
+    { code: "document.querySelector('table').outerHTML", runAt: "document_end" }
+  );
+  await tabs.remove(tab.id);
+  const parser = new DOMParser();
+  return parser.parseFromString(tableHtmlString, 'text/html');
 }
 
 /**
@@ -49,6 +38,7 @@ async function getDocumentAtUrl(url) {
  */
 function getAllHolidays(url) {
   return getDocumentAtUrl(url).then(document => {
+    // By specifying tbody we avoid the header row.
     var lines = document.querySelectorAll('tbody > tr');
     var holidays = Array.from(lines).map((line) => {
       var txtStartDate = line.children[1].textContent;
@@ -71,9 +61,9 @@ function getAllHolidays(url) {
 /**
  * Opens a pto.mozilla.org page in a tab to trigger authentication.
  *
- * @returns Promise
+ * @returns Promise<Tab>
  */
-async function authenticate(url) {
+async function openTabAndAuthenticate(url) {
   const tab = await tabs.create({ url });
 
   // Note: tab.status is invalid right now, we need to wait for a first
@@ -106,7 +96,7 @@ async function authenticate(url) {
     tabs.onUpdated.addListener(updatedListener);
   });
 
-  await tabs.remove(tab.id);
+  return tab;
 }
 
 async function showResults(holidays) {
