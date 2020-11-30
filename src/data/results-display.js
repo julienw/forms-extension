@@ -62,8 +62,15 @@
   function getDefaultState() {
     var state = {};
     var today = new Date();
+
+    // Note that in the state, we keep currentMonth as an integer between 1 and
+    // 12, but the JS standard library uses months between 0 and 11. So the next
+    // line will store the month _before_ the current month. Example: in June,
+    // getUTCMonth() returns "5", but "5" in our state means May.
     state.currentMonth = today.getUTCMonth();
     state.currentYear = today.getUTCFullYear();
+
+    // If the current month is January, we want December of the previous year.
     if (state.currentMonth === 0) {
       state.currentMonth = 12;
       --state.currentYear;

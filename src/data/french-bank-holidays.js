@@ -3,6 +3,7 @@
 (function(exports) {
 'use strict';
 
+// `month` is between 1 and 12 here.
 function utcDate(year, month, day) {
   return new Date(Date.UTC(year, month - 1, day));
 }
