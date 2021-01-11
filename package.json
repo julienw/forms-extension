@@ -24,7 +24,7 @@
   "homepage": "https://github.com/julienw/forms-extension#readme",
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^7.12.1",
+    "eslint": "^7.16.0",
     "mocha": "^8.2.1",
     "web-ext": "^5.4.1",
     "webextension-build-script": "^0.2.0"
