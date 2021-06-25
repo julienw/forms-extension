@@ -108,9 +108,28 @@ function getBoxingDays(year, holidays) {
   }
   return boxing;
 }
+
+function getWellnessDays(year) {
+  if (year === 2021) {
+    return [
+      utcDate(year, 3, 5),
+      utcDate(year, 4, 23),
+      utcDate(year, 5, 14),
+      utcDate(year, 6, 18),
+      utcDate(year, 6, 28),
+      utcDate(year, 6, 29),
+      utcDate(year, 6, 30),
+      utcDate(year, 7, 1),
+      utcDate(year, 7, 2),
+      utcDate(year, 8, 27),
+    ];
+  }
+}
+
 exports.utcDate = utcDate;
 exports.addDays = addDays;
 exports.getFrenchBankHolidays = getFrenchBankHolidays;
 exports.getBoxingDays = getBoxingDays;
+exports.getWellnessDays = getWellnessDays;
 
 })(typeof window === 'object' ? window : exports);

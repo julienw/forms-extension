@@ -1,4 +1,4 @@
-/* global utcDate, getBoxingDays, getFrenchBankHolidays */
+/* global utcDate, getBoxingDays, getFrenchBankHolidays, getWellnessDays */
 (function(exports) {
   "use strict";
 
@@ -61,10 +61,13 @@
     var frenchBankHolidays = getFrenchBankHolidays(year)
     var bankHolidays = frenchBankHolidays
         .map((holiday) => formatDateString(holiday.date));
-    var boxingDays = getBoxingDays(year, frenchBankHolidays)
-        .map((holiday) => formatDateString(holiday.date));
-
-    if (year !== 2017) boxingDays = [];  // Boxing days where tested only in 2017
+    const wellnessDays = getWellnessDays(year)
+        .map((holidayDate) => formatDateString(holidayDate));
+    // Boxing days were tested only in 2017
+    const boxingDays = year === 2017
+      ? getBoxingDays(year, frenchBankHolidays)
+        .map((holiday) => formatDateString(holiday.date))
+      : [];
 
     return weeks.map((week, weekIndex) => {
       return week.map((day, dayIndex) => {
@@ -80,6 +83,8 @@
           if (bankHolidays.includes(currentDate)) {
             day.type = 'JF';
           } else if (boxingDays.includes(currentDate)) {
+            day.type = 'CS';
+          } else if (wellnessDays.includes(currentDate)) {
             day.type = 'CS';
           } else {
             day.type = 'JT';
