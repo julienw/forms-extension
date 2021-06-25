@@ -124,6 +124,9 @@ function getWellnessDays(year) {
       utcDate(year, 8, 27),
     ];
   }
+
+  // catchall
+  return [];
 }
 
 exports.utcDate = utcDate;

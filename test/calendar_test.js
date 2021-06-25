@@ -1,11 +1,12 @@
 var expect = require('chai').expect;
 var Calendar = require('../src/data/calendar');
 
-const {utcDate, addDays, getFrenchBankHolidays, getBoxingDays} = require('../src/data/french-bank-holidays');
+const {utcDate, addDays, getFrenchBankHolidays, getBoxingDays, getWellnessDays} = require('../src/data/french-bank-holidays');
 global.utcDate = utcDate;
 global.addDays = addDays;
 global.getFrenchBankHolidays = getFrenchBankHolidays;
 global.getBoxingDays = getBoxingDays;
+global.getWellnessDays = getWellnessDays;
 
 
 describe("Calendar", () => {
