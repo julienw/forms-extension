@@ -2,7 +2,7 @@ version: 2.1
 orbs:
   node: circleci/node@4.1.0
 
-node-version: &node-version "14.15"
+node-version: &node-version "14.17"
 
 workflows:
   node-tests:
