@@ -122,6 +122,9 @@ function getWellnessDays(year) {
       utcDate(year, 7, 1),
       utcDate(year, 7, 2),
       utcDate(year, 8, 27),
+      utcDate(year, 9, 24),
+      utcDate(year, 10, 29),
+      utcDate(year, 11, 12),
     ];
   }
 
