@@ -213,6 +213,16 @@
             interpolateData, { safe: ['cells']}
           )
         );
+      } else {
+        // At least update the error status!
+        week.forEach((day, day_id) => {
+          const dayElement = document.querySelector(
+            `[data-week="${week_id}"][data-day="${day_id}"]`
+          );
+          if (dayElement) {
+            dayElement.classList.toggle('erroneous', !!day.error) ;
+          }
+        });
       }
     });
 
