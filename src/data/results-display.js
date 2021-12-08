@@ -123,6 +123,10 @@
       if (extractTypeResult) {
         type = extractTypeResult[0];
       }
+
+      if (type === "RTT") {
+        type = "JRTT";
+      }
     }
 
     const day = state.weeks[weekId][dayId];
