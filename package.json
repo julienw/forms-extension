@@ -1,6 +1,6 @@
 {
   "name": "forms-extension",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "Used by french employees to generate their holiday form",
   "main": "index.js",
   "scripts": {
