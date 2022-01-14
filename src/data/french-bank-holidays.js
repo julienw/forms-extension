@@ -128,6 +128,17 @@ function getWellnessDays(year) {
     ];
   }
 
+  if (year === 2022) {
+    return [
+      utcDate(year, 3, 7),
+      utcDate(year, 4, 8),
+      utcDate(year, 7, 1),
+      utcDate(year, 8, 5),
+      utcDate(year, 9, 16),
+      utcDate(year, 10, 21),
+    ]
+  }
+
   // catchall
   return [];
 }
