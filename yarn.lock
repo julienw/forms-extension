@@ -1093,10 +1093,10 @@ eslint@8.18.0:
     text-table "^0.2.0"
     v8-compile-cache "^2.0.3"
 
-eslint@^8.19.0:
-  version "8.19.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.19.0.tgz#7342a3cbc4fbc5c106a1eefe0fd0b50b6b1a7d28"
-  integrity sha512-SXOPj3x9VKvPe81TjjUJCYlV4oJjQw68Uek+AM0X4p+33dj2HY5bpTZOgnQHcG2eAm1mtCU9uNMnJi7exU/kYw==
+eslint@^8.20.0:
+  version "8.20.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.20.0.tgz#048ac56aa18529967da8354a478be4ec0a2bc81b"
+  integrity sha512-d4ixhz5SKCa1D6SCPrivP7yYVi7nyD6A4vs6HIAul9ujBzcEmZVM3/0NN/yu5nKhmO1wjp5xQ46iRfmDGlOviA==
   dependencies:
     "@eslint/eslintrc" "^1.3.0"
     "@humanwhocodes/config-array" "^0.9.2"
@@ -3202,7 +3202,7 @@ wcwidth@^1.0.0:
   dependencies:
     defaults "^1.0.3"
 
-web-ext@^7.0.0, web-ext@^7.1.1:
+web-ext@^7.1.1:
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/web-ext/-/web-ext-7.1.1.tgz#c548b04753889f4f37764f3836e85ecb5a4d2cee"
   integrity sha512-ehqPS8QHNKyAz6C1NBkDNbzWtuM9LfGMWF2WZx+9U1TCRdoLdZAqHhxF5hDwZFAPKkPW/iuQQ6r2qQiv7T3aYw==
@@ -3238,16 +3238,15 @@ web-ext@^7.0.0, web-ext@^7.1.1:
     yargs "17.5.1"
     zip-dir "2.0.0"
 
-webextension-build-script@^0.4.3:
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/webextension-build-script/-/webextension-build-script-0.4.3.tgz#96fa0106c8142146634dfecc898245133eeec983"
-  integrity sha512-IAdCUuWoYkpFhbKQw9+HoOjDcA9WvLeI1IXdsymin5GoYvld9tnaMC3+yFbKU9sp8eo4I/zG9+dlZOWnsORa6A==
+webextension-build-script@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/webextension-build-script/-/webextension-build-script-0.5.0.tgz#a1677e05a57424caf9ff146507fe2b4bff4804d3"
+  integrity sha512-Cn9Xd3kvTZDY4adBsyse0WPh+K7CMJ2XSXXfi9aYeOWUFR3whgjpgiki1T4DxC9qWPBL1+eYF8oIZsa80/Setg==
   dependencies:
     common-tags "^1.8.2"
     minimist "^1.2.6"
     semver "^7.3.7"
     tmp "^0.2.1"
-    web-ext "^7.0.0"
 
 when@3.7.7:
   version "3.7.7"
