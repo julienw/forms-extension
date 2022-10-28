@@ -25,8 +25,8 @@
   "devDependencies": {
     "chai": "^4.3.6",
     "eslint": "^8.25.0",
-    "mocha": "^10.0.0",
-    "web-ext": "^7.2.0",
+    "mocha": "^10.1.0",
+    "web-ext": "^7.3.1",
     "webextension-build-script": "^0.5.0"
   }
 }
